@@ -1,0 +1,3255 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>VUA APP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Lora:ital,wght@1,600&display=swap">
+<style>
+:root{
+  --bg:#FAF7F8; --surface:#FFFFFF; --surface-2:#F3EEF0; --ink:#231C22; --muted:#6F6570; --line:#E7DFE3;
+  --accent:#1E7A68; --accent-ink:#FFFFFF; --accent-soft:#E2F1EC; --blush:#F6E1E6; --blush-ink:#8A3B4E;
+  --ok:#2F8F5B; --ok-soft:#E3F3E9; --warn:#A8690F; --warn-soft:#FBEFD9; --bad:#C2413A; --bad-soft:#FBE4E2;
+  --info:#3563B8; --info-soft:#E4ECFA; --shadow:0 10px 30px rgba(35,28,34,.12);
+  --radius:14px; --font:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --brand:"Lora",Georgia,serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#121514; --surface:#1A1F1D; --surface-2:#232927; --ink:#ECE8EA; --muted:#A39AA1; --line:#303734;
+    --accent:#4CC1A6; --accent-ink:#0D1F1A; --accent-soft:#1D3530; --blush:#3A2429; --blush-ink:#F1B8C5;
+    --ok:#5BC48A; --ok-soft:#1C3326; --warn:#E0A94A; --warn-soft:#3A2E17; --bad:#EF7A73; --bad-soft:#3B1F1D;
+    --info:#86A8F2; --info-soft:#1E2A42; --shadow:0 10px 30px rgba(0,0,0,.45);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#121514; --surface:#1A1F1D; --surface-2:#232927; --ink:#ECE8EA; --muted:#A39AA1; --line:#303734;
+  --accent:#4CC1A6; --accent-ink:#0D1F1A; --accent-soft:#1D3530; --blush:#3A2429; --blush-ink:#F1B8C5;
+  --ok:#5BC48A; --ok-soft:#1C3326; --warn:#E0A94A; --warn-soft:#3A2E17; --bad:#EF7A73; --bad-soft:#3B1F1D;
+  --info:#86A8F2; --info-soft:#1E2A42; --shadow:0 10px 30px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.app{display:flex;min-height:100%}
+/* nav */
+.rail{display:none}
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topbar-in{display:flex;align-items:center;gap:12px;padding:10px 16px;max-width:1120px;margin:0 auto}
+.brand{font-family:var(--brand);font-style:italic;font-weight:600;font-size:20px;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand small{display:block;font-family:var(--font);font-style:normal;font-weight:500;font-size:12px;color:var(--muted);letter-spacing:.3px}
+.spacer{flex:1}
+.icon-btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;height:38px;min-width:38px;padding:0 10px;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-weight:600;font-size:13px}
+.mode-pill{display:inline-flex;border:1px solid var(--line);border-radius:999px;background:var(--surface);padding:3px}
+.mode-pill button{border:0;background:transparent;border-radius:999px;padding:5px 11px;font-size:13px;font-weight:600;color:var(--muted)}
+.mode-pill button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(6,1fr);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px))}
+.tabbar button,.rail button{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:600;color:var(--muted);padding:6px 2px;border-radius:10px}
+.tabbar button svg,.rail button svg{width:22px;height:22px}
+.tabbar button[aria-current="page"],.rail button[aria-current="page"]{color:var(--accent)}
+.tabbar button[aria-current="page"] svg{stroke-width:2.2}
+.main{flex:1;min-width:0}
+.content{max-width:1120px;margin:0 auto;padding:16px 16px 110px;display:flex;flex-direction:column;gap:18px}
+@media (min-width:900px){
+  .tabbar{display:none}
+  .rail{display:flex;flex-direction:column;gap:4px;width:92px;flex:none;position:sticky;top:0;height:100vh;border-right:1px solid var(--line);background:var(--surface);padding:18px 8px}
+  .rail button{font-size:12px;padding:10px 4px}
+  .rail button[aria-current="page"]{background:var(--accent-soft)}
+  .content{padding:24px 28px 48px}
+}
+/* type */
+h1{font-size:24px;line-height:1.2;margin:0;text-wrap:balance;font-weight:700;letter-spacing:-.2px}
+h2{font-size:16px;margin:0;font-weight:700}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:var(--muted)}
+.head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+/* tiles */
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (min-width:700px){.tiles{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;display:flex;flex-direction:column;gap:2px}
+.tile .v{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.3px}
+.tile .l{font-size:12.5px;color:var(--muted);font-weight:500}
+/* sections */
+.grid2{display:grid;gap:18px}
+@media (min-width:980px){.grid2{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.panel-h{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.panel-h .count{margin-left:auto;font-size:12px;font-weight:700;border-radius:999px;padding:2px 9px;background:var(--surface-2);color:var(--muted)}
+.panel-h .dot{width:9px;height:9px;border-radius:50%;flex:none}
+.panel-sub{font-size:12.5px;color:var(--muted);padding:0 14px 10px;margin-top:-4px}
+.list{display:flex;flex-direction:column}
+.row{display:flex;align-items:center;gap:12px;padding:11px 14px;border-top:1px solid var(--line)}
+.list>.row:first-child{border-top:0}
+.row-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.row-main b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row-main span{font-size:13px;color:var(--muted)}
+.row-acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+@media (max-width:640px){.row{flex-wrap:wrap}.row-acts{flex:1 1 100%;justify-content:flex-start}.row-acts:empty{display:none}}
+.row.clickable{cursor:pointer}
+.attgrid{border-collapse:separate;border-spacing:0;font-size:12px;min-width:100%}
+.attgrid th,.attgrid td{padding:4px 3px;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap}
+.attgrid thead th{font-weight:600;color:var(--muted)}
+.attgrid thead th button{border:0;background:transparent;color:inherit;font:inherit;font-weight:700;display:flex;flex-direction:column;align-items:center;line-height:1.1;padding:2px 3px;border-radius:6px}
+.attgrid thead th small{font-size:9.5px;font-weight:500}
+.attgrid thead th.sel button{background:var(--accent);color:var(--accent-ink)}
+.attgrid .sticky{position:sticky;left:0;background:var(--surface);text-align:left;padding-left:14px;padding-right:10px;font-weight:600;color:var(--ink);z-index:1}
+.attgrid td span,.attkey{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:6px;color:#fff;font-weight:700;font-size:11px}
+.attgrid td i{color:var(--line);font-style:normal}
+.paytable{border-collapse:collapse;width:100%;font-size:13.5px;font-variant-numeric:tabular-nums}
+.paytable th,.paytable td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+.paytable th:first-child,.paytable td:first-child{text-align:left}
+.paytable thead th{font-size:12px;color:var(--muted);font-weight:600;background:var(--surface-2)}
+.paytable tbody tr{cursor:pointer}
+.paytable tbody tr:hover{background:var(--surface-2)}
+.paytable tfoot td{font-weight:700;background:var(--surface-2);border-bottom:0}
+
+.row.clickable:hover{background:var(--surface-2)}
+.empty{padding:16px 14px;color:var(--muted);font-size:13.5px}
+.time{font-weight:700;font-variant-numeric:tabular-nums;min-width:48px}
+/* buttons */
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 14px;font-weight:600;font-size:14px;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;color:var(--ink);white-space:nowrap}
+.btn.sm{padding:6px 10px;font-size:12.5px;border-radius:8px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.zalo{background:var(--info-soft);border-color:transparent;color:var(--info)}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--bad)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.fab{position:fixed;right:16px;bottom:calc(78px + env(safe-area-inset-bottom,0px));z-index:25;box-shadow:var(--shadow);border-radius:999px;padding:13px 18px}
+@media (min-width:900px){.fab{bottom:28px;right:28px}}
+/* chips & pills */
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;border-radius:999px;padding:3px 9px;white-space:nowrap}
+.st-booked{background:var(--surface-2);color:var(--muted)}
+.st-confirmed{background:var(--info-soft);color:var(--info)}
+.st-arrived{background:var(--warn-soft);color:var(--warn)}
+.st-done{background:var(--ok-soft);color:var(--ok)}
+.st-noshow{background:var(--bad-soft);color:var(--bad)}
+.st-cancelled{background:var(--surface-2);color:var(--muted);text-decoration:line-through}
+.tag{font-size:11.5px;font-weight:600;border-radius:6px;padding:2px 7px;background:var(--blush);color:var(--blush-ink)}
+.tag.debt{background:var(--bad-soft);color:var(--bad)}
+.tag.course{background:var(--accent-soft);color:var(--accent)}
+.avatar{width:38px;height:38px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:700;font-size:13px;background:var(--blush);color:var(--blush-ink)}
+.staff-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px;vertical-align:1px}
+/* day strip */
+.daystrip{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.day{flex:none;width:54px;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:7px 0;display:flex;flex-direction:column;align-items:center;gap:1px}
+.day .wd{font-size:11px;font-weight:600;color:var(--muted)}
+.day .dd{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
+.day .n{font-size:10.5px;color:var(--muted);font-weight:600}
+.day[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.day[aria-pressed="true"] .wd,.day[aria-pressed="true"] .n{color:var(--accent-ink)}
+.day.today:not([aria-pressed="true"]){border-color:var(--accent)}
+/* forms */
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:12.5px;font-weight:600;color:var(--muted)}
+.input,select.input,textarea.input{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 12px;font-size:15px}
+.input:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px var(--accent-soft)}
+.form{display:flex;flex-direction:column;gap:12px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.search{position:relative}
+.search .input{padding-left:38px}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--muted)}
+.picker-results{border:1px solid var(--line);border-radius:10px;margin-top:6px;max-height:210px;overflow:auto;background:var(--surface)}
+.picker-results button{display:flex;width:100%;text-align:left;border:0;border-top:1px solid var(--line);background:transparent;padding:9px 12px;gap:8px;align-items:center}
+.picker-results button:first-child{border-top:0}
+.picker-results button:hover{background:var(--surface-2)}
+.picked{display:flex;align-items:center;gap:10px;border:1px solid var(--accent);background:var(--accent-soft);border-radius:10px;padding:8px 10px}
+.seg{display:flex;background:var(--surface-2);border-radius:12px;padding:4px;gap:4px}
+.seg button{flex:1;border:0;background:transparent;border-radius:9px;padding:8px 6px;font-weight:600;font-size:13.5px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.warnbox{background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:9px 12px;font-size:13px;font-weight:500}
+.infobox{background:var(--surface-2);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--muted)}
+.total{display:flex;justify-content:space-between;align-items:baseline;font-size:14px}
+.total b{font-size:20px;font-variant-numeric:tabular-nums}
+/* progress */
+.prog{height:7px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.prog>i{display:block;height:100%;background:var(--accent);border-radius:99px}
+/* sheet */
+#sheet{position:fixed;inset:0;z-index:50}
+.sheet-back{position:absolute;inset:0;background:rgba(20,14,18,.42)}
+.sheet{position:absolute;left:0;right:0;bottom:0;max-height:92%;overflow:auto;background:var(--bg);border-radius:20px 20px 0 0;padding:8px 16px calc(20px + env(safe-area-inset-bottom,0px));box-shadow:var(--shadow);display:flex;flex-direction:column;gap:14px}
+.sheet::before{content:"";width:40px;height:4px;border-radius:9px;background:var(--line);align-self:center;margin-bottom:2px}
+.sheet-h{display:flex;align-items:center;gap:10px}
+.sheet-h h2{font-size:18px;flex:1}
+@media (min-width:700px){.sheet{left:50%;right:auto;bottom:auto;top:50%;transform:translate(-50%,-50%);width:min(560px,calc(100% - 32px));border-radius:18px;max-height:88%;padding:18px 20px}.sheet::before{display:none}}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;font-weight:500}
+.btn-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+/* toast & banner */
+#toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;font-weight:500;box-shadow:var(--shadow);max-width:calc(100% - 32px)}
+@media (min-width:900px){#toast{bottom:32px}}
+.banner{background:var(--warn-soft);color:var(--warn);border-radius:12px;padding:10px 14px;font-size:13.5px;font-weight:500}
+/* report */
+.bars{display:flex;align-items:flex-end;gap:8px;height:150px;padding:14px 14px 0}
+.bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end;min-width:0}
+.bar i{display:block;width:100%;max-width:34px;background:var(--accent);border-radius:6px 6px 2px 2px;min-height:2px}
+.bar.today i{background:var(--blush-ink)}
+.bar span{font-size:11px;color:var(--muted);font-weight:600}
+.bar em{font-style:normal;font-size:10.5px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.hbar{display:flex;align-items:center;gap:10px;padding:9px 14px;border-top:1px solid var(--line);font-size:14px}
+.hbar:first-child{border-top:0}
+.hbar .name{width:40%;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hbar .track{flex:1;height:8px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+.hbar .track i{display:block;height:100%;background:var(--accent)}
+.hbar .val{min-width:84px;text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:no-preference){.sheet{animation:up .22s ease-out}@keyframes up{from{opacity:.4;translate:0 24px}to{opacity:1;translate:0 0}}}
+</style>
+
+<script id="seed-data" type="application/json">{
+ "ws/nhakhoa/advances": {
+  "v1": {
+   "staffId": "b3",
+   "amount": 2000000,
+   "note": "Tạm ứng",
+   "date": "2026-09-12"
+  }
+ },
+ "ws/nhakhoa/attendance": {
+  "b1_2026-09": {
+   "staffId": "b1",
+   "month": "2026-09",
+   "days": {
+    "01": {
+     "s": "absent"
+    },
+    "02": {
+     "s": "present",
+     "in": "08:20",
+     "out": "17:36"
+    },
+    "03": {
+     "s": "present",
+     "in": "08:29",
+     "out": "17:56"
+    },
+    "04": {
+     "s": "late",
+     "in": "08:45",
+     "out": "17:31"
+    },
+    "05": {
+     "s": "present",
+     "in": "08:13",
+     "out": "17:59"
+    },
+    "07": {
+     "s": "present",
+     "in": "08:16",
+     "out": "17:45"
+    },
+    "08": {
+     "s": "present",
+     "in": "08:23",
+     "out": "17:55"
+    },
+    "09": {
+     "s": "present",
+     "in": "08:12",
+     "out": "17:55"
+    },
+    "10": {
+     "s": "present",
+     "in": "08:22",
+     "out": "17:44"
+    },
+    "11": {
+     "s": "present",
+     "in": "08:12",
+     "out": "17:53"
+    },
+    "12": {
+     "s": "present",
+     "in": "08:14",
+     "out": "17:30"
+    },
+    "14": {
+     "s": "present",
+     "in": "08:24",
+     "out": "17:55"
+    },
+    "15": {
+     "s": "present",
+     "in": "08:29",
+     "out": "17:56"
+    },
+    "16": {
+     "s": "present",
+     "in": "08:25",
+     "out": "17:51"
+    },
+    "17": {
+     "s": "present",
+     "in": "08:14",
+     "out": "17:47"
+    },
+    "18": {
+     "s": "present",
+     "in": "08:10",
+     "out": "17:30"
+    },
+    "19": {
+     "s": "present",
+     "in": "08:13",
+     "out": "17:46"
+    },
+    "21": {
+     "s": "present",
+     "in": "08:14",
+     "out": "17:43"
+    },
+    "22": {
+     "s": "present",
+     "in": "08:16",
+     "out": "17:56"
+    },
+    "23": {
+     "s": "present",
+     "in": "08:10",
+     "out": "17:38"
+    },
+    "24": {
+     "s": "present",
+     "in": "08:26",
+     "out": "17:37"
+    },
+    "25": {
+     "s": "present",
+     "in": "08:20"
+    }
+   }
+  },
+  "b2_2026-09": {
+   "staffId": "b2",
+   "month": "2026-09",
+   "days": {
+    "01": {
+     "s": "present",
+     "in": "08:23",
+     "out": "17:56"
+    },
+    "02": {
+     "s": "present",
+     "in": "08:21",
+     "out": "17:58"
+    },
+    "03": {
+     "s": "present",
+     "in": "08:28",
+     "out": "17:56"
+    },
+    "04": {
+     "s": "present",
+     "in": "08:23",
+     "out": "17:56"
+    },
+    "05": {
+     "s": "present",
+     "in": "08:26",
+     "out": "17:34"
+    },
+    "07": {
+     "s": "present",
+     "in": "08:26",
+     "out": "17:46"
+    },
+    "08": {
+     "s": "late",
+     "in": "08:47",
+     "out": "17:32"
+    },
+    "09": {
+     "s": "present",
+     "in": "08:14",
+     "out": "17:35"
+    },
+    "10": {
+     "s": "present",
+     "in": "08:29",
+     "out": "17:53"
+    },
+    "11": {
+     "s": "present",
+     "in": "08:11",
+     "out": "17:40"
+    },
+    "12": {
+     "s": "present",
+     "in": "08:26",
+     "out": "17:47"
+    },
+    "14": {
+     "s": "present",
+     "in": "08:13",
+     "out": "17:58"
+    },
+    "15": {
+     "s": "present",
+     "in": "08:17",
+     "out": "17:36"
+    },
+    "16": {
+     "s": "present",
+     "in": "08:13",
+     "out": "17:46"
+    },
+    "17": {
+     "s": "present",
+     "in": "08:10",
+     "out": "17:54"
+    },
+    "18": {
+     "s": "present",
+     "in": "08:12",
+     "out": "17:44"
+    },
+    "19": {
+     "s": "present",
+     "in": "08:26",
+     "out": "17:49"
+    },
+    "21": {
+     "s": "present",
+     "in": "08:18",
+     "out": "17:44"
+    },
+    "22": {
+     "s": "present",
+     "in": "08:25",
+     "out": "17:46"
+    },
+    "23": {
+     "s": "present",
+     "in": "08:26",
+     "out": "17:58"
+    },
+    "24": {
+     "s": "present",
+     "in": "08:18",
+     "out": "17:59"
+    },
+    "25": {
+     "s": "present",
+     "in": "08:16"
+    }
+   }
+  },
+  "b3_2026-09": {
+   "staffId": "b3",
+   "month": "2026-09",
+   "days": {
+    "01": {
+     "s": "present",
+     "in": "08:14",
+     "out": "17:43"
+    },
+    "02": {
+     "s": "present",
+     "in": "08:24",
+     "out": "17:40"
+    },
+    "03": {
+     "s": "late",
+     "in": "08:43",
+     "out": "17:36"
+    },
+    "04": {
+     "s": "late",
+     "in": "08:44",
+     "out": "17:31"
+    },
+    "05": {
+     "s": "present",
+     "in": "08:14",
+     "out": "17:52"
+    },
+    "07": {
+     "s": "present",
+     "in": "08:21",
+     "out": "17:34"
+    },
+    "08": {
+     "s": "present",
+     "in": "08:14",
+     "out": "17:44"
+    },
+    "09": {
+     "s": "present",
+     "in": "08:13",
+     "out": "17:42"
+    },
+    "10": {
+     "s": "present",
+     "in": "08:15",
+     "out": "17:51"
+    },
+    "11": {
+     "s": "present",
+     "in": "08:15",
+     "out": "17:52"
+    },
+    "12": {
+     "s": "present",
+     "in": "08:26",
+     "out": "17:42"
+    },
+    "14": {
+     "s": "present",
+     "in": "08:16",
+     "out": "17:41"
+    },
+    "15": {
+     "s": "present",
+     "in": "08:21",
+     "out": "17:30"
+    },
+    "16": {
+     "s": "present",
+     "in": "08:24",
+     "out": "17:44"
+    },
+    "17": {
+     "s": "present",
+     "in": "08:22",
+     "out": "17:40"
+    },
+    "18": {
+     "s": "present",
+     "in": "08:19",
+     "out": "17:46"
+    },
+    "19": {
+     "s": "present",
+     "in": "08:13",
+     "out": "17:59"
+    },
+    "21": {
+     "s": "present",
+     "in": "08:13",
+     "out": "17:32"
+    },
+    "22": {
+     "s": "present",
+     "in": "08:11",
+     "out": "17:58"
+    },
+    "23": {
+     "s": "present",
+     "in": "08:18",
+     "out": "17:54"
+    },
+    "24": {
+     "s": "present",
+     "in": "08:23",
+     "out": "17:57"
+    }
+   }
+  }
+ },
+ "ws/nhakhoa/settings": {
+  "main": {
+   "workDays": 26,
+   "latePenalty": 50000,
+   "shiftStart": "08:30",
+   "name": "Nha khoa Nụ Cười Việt"
+  }
+ },
+ "ws/nhakhoa/staff": {
+  "b1": {
+   "phone": "0909222001",
+   "startDate": "2022-05-01",
+   "baseSalary": 15000000,
+   "active": true,
+   "name": "BS. Tuấn",
+   "role": "Tổng quát, phục hình",
+   "color": "#1E7A68"
+  },
+  "b2": {
+   "phone": "0909222002",
+   "startDate": "2023-02-01",
+   "baseSalary": 14000000,
+   "active": true,
+   "name": "BS. Vy",
+   "role": "Chỉnh nha",
+   "color": "#B0476A"
+  },
+  "b3": {
+   "phone": "0909222003",
+   "startDate": "2024-09-01",
+   "baseSalary": 13000000,
+   "active": true,
+   "name": "BS. Khoa",
+   "role": "Tiểu phẫu",
+   "color": "#3563B8"
+  }
+ },
+ "ws/spa/advances": {
+  "v1": {
+   "staffId": "st2",
+   "amount": 1000000,
+   "note": "Tạm ứng giữa tháng",
+   "date": "2026-09-15"
+  },
+  "v2": {
+   "staffId": "st4",
+   "amount": 500000,
+   "note": "Việc gia đình",
+   "date": "2026-09-20"
+  }
+ },
+ "ws/spa/attendance": {
+  "st1_2026-09": {
+   "staffId": "st1",
+   "month": "2026-09",
+   "days": {
+    "02": {
+     "s": "present",
+     "in": "08:14",
+     "out": "17:42"
+    },
+    "03": {
+     "s": "present",
+     "in": "08:12",
+     "out": "17:56"
+    },
+    "04": {
+     "s": "present",
+     "in": "08:21",
+     "out": "17:48"
+    },
+    "05": {
+     "s": "late",
+     "in": "08:48",
+     "out": "17:33"
+    },
+    "06": {
+     "s": "late",
+     "in": "08:46",
+     "out": "17:36"
+    },
+    "07": {
+     "s": "late",
+     "in": "08:41",
+     "out": "17:38"
+    },
+    "09": {
+     "s": "present",
+     "in": "08:28",
+     "out": "17:33"
+    },
+    "10": {
+     "s": "present",
+     "in": "08:28",
+     "out": "17:31"
+    },
+    "11": {
+     "s": "present",
+     "in": "08:22",
+     "out": "17:31"
+    },
+    "12": {
+     "s": "present",
+     "in": "08:11",
+     "out": "17:47"
+    },
+    "13": {
+     "s": "present",
+     "in": "08:19",
+     "out": "17:43"
+    },
+    "14": {
+     "s": "present",
+     "in": "08:13",
+     "out": "17:48"
+    },
+    "16": {
+     "s": "present",
+     "in": "08:15",
+     "out": "17:33"
+    },
+    "17": {
+     "s": "present",
+     "in": "08:16",
+     "out": "17:41"
+    },
+    "18": {
+     "s": "absent"
+    },
+    "19": {
+     "s": "present",
+     "in": "08:28",
+     "out": "17:31"
+    },
+    "20": {
+     "s": "present",
+     "in": "08:25",
+     "out": "17:51"
+    },
+    "21": {
+     "s": "present",
+     "in": "08:20",
+     "out": "17:44"
+    },
+    "23": {
+     "s": "present",
+     "in": "08:24",
+     "out": "17:41"
+    },
+    "24": {
+     "s": "present",
+     "in": "08:15",
+     "out": "17:52"
+    },
+    "25": {
+     "s": "present",
+     "in": "08:12"
+    }
+   }
+  },
+  "st2_2026-09": {
+   "staffId": "st2",
+   "month": "2026-09",
+   "days": {
+    "01": {
+     "s": "present",
+     "in": "08:26",
+     "out": "17:45"
+    },
+    "03": {
+     "s": "present",
+     "in": "08:24",
+     "out": "17:39"
+    },
+    "04": {
+     "s": "present",
+     "in": "08:12",
+     "out": "17:33"
+    },
+    "05": {
+     "s": "present",
+     "in": "08:15",
+     "out": "17:54"
+    },
+    "06": {
+     "s": "present",
+     "in": "08:25",
+     "out": "17:43"
+    },
+    "07": {
+     "s": "late",
+     "in": "08:41",
+     "out": "17:38"
+    },
+    "08": {
+     "s": "present",
+     "in": "08:20",
+     "out": "17:40"
+    },
+    "10": {
+     "s": "present",
+     "in": "08:29",
+     "out": "17:45"
+    },
+    "11": {
+     "s": "present",
+     "in": "08:24",
+     "out": "17:32"
+    },
+    "12": {
+     "s": "present",
+     "in": "08:18",
+     "out": "17:45"
+    },
+    "13": {
+     "s": "present",
+     "in": "08:12",
+     "out": "17:31"
+    },
+    "14": {
+     "s": "present",
+     "in": "08:19",
+     "out": "17:50"
+    },
+    "15": {
+     "s": "present",
+     "in": "08:24",
+     "out": "17:39"
+    },
+    "17": {
+     "s": "present",
+     "in": "08:21",
+     "out": "17:30"
+    },
+    "18": {
+     "s": "present",
+     "in": "08:21",
+     "out": "17:35"
+    },
+    "19": {
+     "s": "present",
+     "in": "08:25",
+     "out": "17:31"
+    },
+    "20": {
+     "s": "present",
+     "in": "08:19",
+     "out": "17:34"
+    },
+    "21": {
+     "s": "present",
+     "in": "08:22",
+     "out": "17:42"
+    },
+    "22": {
+     "s": "present",
+     "in": "08:25",
+     "out": "17:32"
+    },
+    "24": {
+     "s": "present",
+     "in": "08:22",
+     "out": "17:47"
+    },
+    "25": {
+     "s": "present",
+     "in": "08:14"
+    }
+   }
+  },
+  "st3_2026-09": {
+   "staffId": "st3",
+   "month": "2026-09",
+   "days": {
+    "01": {
+     "s": "present",
+     "in": "08:27",
+     "out": "17:38"
+    },
+    "02": {
+     "s": "present",
+     "in": "08:21",
+     "out": "17:51"
+    },
+    "04": {
+     "s": "present",
+     "in": "08:17",
+     "out": "17:34"
+    },
+    "05": {
+     "s": "absent"
+    },
+    "06": {
+     "s": "present",
+     "in": "08:17",
+     "out": "17:30"
+    },
+    "07": {
+     "s": "present",
+     "in": "08:28",
+     "out": "17:35"
+    },
+    "08": {
+     "s": "present",
+     "in": "08:10",
+     "out": "17:34"
+    },
+    "09": {
+     "s": "present",
+     "in": "08:21",
+     "out": "17:49"
+    },
+    "11": {
+     "s": "present",
+     "in": "08:14",
+     "out": "17:52"
+    },
+    "12": {
+     "s": "present",
+     "in": "08:29",
+     "out": "17:50"
+    },
+    "13": {
+     "s": "present",
+     "in": "08:11",
+     "out": "17:44"
+    },
+    "14": {
+     "s": "present",
+     "in": "08:27",
+     "out": "17:42"
+    },
+    "15": {
+     "s": "present",
+     "in": "08:22",
+     "out": "17:33"
+    },
+    "16": {
+     "s": "present",
+     "in": "08:22",
+     "out": "17:31"
+    },
+    "18": {
+     "s": "present",
+     "in": "08:16",
+     "out": "17:44"
+    },
+    "19": {
+     "s": "present",
+     "in": "08:20",
+     "out": "17:49"
+    },
+    "20": {
+     "s": "late",
+     "in": "08:40",
+     "out": "17:39"
+    },
+    "21": {
+     "s": "present",
+     "in": "08:13",
+     "out": "17:41"
+    },
+    "22": {
+     "s": "present",
+     "in": "08:12",
+     "out": "17:57"
+    },
+    "23": {
+     "s": "present",
+     "in": "08:22",
+     "out": "17:34"
+    },
+    "25": {
+     "s": "present",
+     "in": "08:21"
+    }
+   }
+  },
+  "st4_2026-09": {
+   "staffId": "st4",
+   "month": "2026-09",
+   "days": {
+    "01": {
+     "s": "present",
+     "in": "08:25",
+     "out": "17:33"
+    },
+    "02": {
+     "s": "present",
+     "in": "08:25",
+     "out": "17:44"
+    },
+    "03": {
+     "s": "present",
+     "in": "08:19",
+     "out": "17:32"
+    },
+    "04": {
+     "s": "present",
+     "in": "08:20",
+     "out": "17:53"
+    },
+    "05": {
+     "s": "present",
+     "in": "08:15",
+     "out": "17:46"
+    },
+    "06": {
+     "s": "late",
+     "in": "08:48",
+     "out": "17:35"
+    },
+    "07": {
+     "s": "leave"
+    },
+    "08": {
+     "s": "present",
+     "in": "08:27",
+     "out": "17:59"
+    },
+    "09": {
+     "s": "late",
+     "in": "08:48",
+     "out": "17:34"
+    },
+    "10": {
+     "s": "present",
+     "in": "08:12",
+     "out": "17:52"
+    },
+    "11": {
+     "s": "present",
+     "in": "08:26",
+     "out": "17:41"
+    },
+    "12": {
+     "s": "present",
+     "in": "08:21",
+     "out": "17:54"
+    },
+    "13": {
+     "s": "present",
+     "in": "08:27",
+     "out": "17:54"
+    },
+    "15": {
+     "s": "present",
+     "in": "08:17",
+     "out": "17:49"
+    },
+    "16": {
+     "s": "present",
+     "in": "08:16",
+     "out": "17:55"
+    },
+    "17": {
+     "s": "present",
+     "in": "08:22",
+     "out": "17:53"
+    },
+    "18": {
+     "s": "present",
+     "in": "08:16",
+     "out": "17:46"
+    },
+    "19": {
+     "s": "present",
+     "in": "08:10",
+     "out": "17:30"
+    },
+    "20": {
+     "s": "present",
+     "in": "08:25",
+     "out": "17:38"
+    },
+    "22": {
+     "s": "present",
+     "in": "08:29",
+     "out": "17:41"
+    },
+    "23": {
+     "s": "present",
+     "in": "08:21",
+     "out": "17:41"
+    },
+    "24": {
+     "s": "absent"
+    }
+   }
+  }
+ },
+ "ws/spa/settings": {
+  "main": {
+   "workDays": 26,
+   "latePenalty": 30000,
+   "shiftStart": "08:30",
+   "name": "Spa Hoa Mai"
+  }
+ },
+ "ws/spa/staff": {
+  "st1": {
+   "phone": "0908111001",
+   "startDate": "2024-03-01",
+   "baseSalary": 7000000,
+   "active": true,
+   "name": "Hoa",
+   "role": "Chăm sóc da",
+   "color": "#1E7A68"
+  },
+  "st2": {
+   "phone": "0908111002",
+   "startDate": "2024-06-15",
+   "baseSalary": 6500000,
+   "active": true,
+   "name": "Mai",
+   "role": "Body, massage",
+   "color": "#B0476A"
+  },
+  "st3": {
+   "phone": "0908111003",
+   "startDate": "2025-01-10",
+   "baseSalary": 6500000,
+   "active": true,
+   "name": "Linh",
+   "role": "Mi, mày",
+   "color": "#3563B8"
+  },
+  "st4": {
+   "phone": "0908111004",
+   "startDate": "2025-08-01",
+   "baseSalary": 5500000,
+   "active": true,
+   "name": "Thảo",
+   "role": "Gội, dưỡng sinh",
+   "color": "#A8690F"
+  }
+ },
+ "ws/nhakhoa/appointments": {
+  "e01": {
+   "customerId": "n01",
+   "serviceId": "d2",
+   "staffId": "b1",
+   "date": "2026-03-20",
+   "time": "09:00",
+   "status": "done",
+   "courseId": "",
+   "note": "",
+   "createdAt": "2026-03-20",
+   "value": 300000,
+   "commission": 30000,
+   "doneAt": "2026-03-20"
+  },
+  "e02": {
+   "customerId": "n03",
+   "serviceId": "d1",
+   "staffId": "b1",
+   "date": "2026-03-28",
+   "time": "10:00",
+   "status": "done",
+   "courseId": "",
+   "note": "",
+   "createdAt": "2026-03-28",
+   "value": 150000,
+   "commission": 0,
+   "doneAt": "2026-03-28"
+  },
+  "e03": {
+   "customerId": "n05",
+   "serviceId": "d3",
+   "staffId": "b1",
+   "date": "2026-09-15",
+   "time": "16:00",
+   "status": "done",
+   "courseId": "",
+   "note": "",
+   "createdAt": "2026-09-15",
+   "value": 500000,
+   "commission": 50000,
+   "doneAt": "2026-09-15"
+  },
+  "e04": {
+   "customerId": "n02",
+   "serviceId": "d5",
+   "staffId": "b2",
+   "date": "2026-08-22",
+   "time": "17:30",
+   "status": "done",
+   "courseId": "m1",
+   "note": "",
+   "createdAt": "2026-08-22",
+   "value": 1458333,
+   "commission": 145833,
+   "doneAt": "2026-08-22"
+  },
+  "e05": {
+   "customerId": "n06",
+   "serviceId": "d5",
+   "staffId": "b2",
+   "date": "2026-08-26",
+   "time": "18:00",
+   "status": "done",
+   "courseId": "m2",
+   "note": "",
+   "createdAt": "2026-08-26",
+   "value": 1458333,
+   "commission": 145833,
+   "doneAt": "2026-08-26"
+  },
+  "e06": {
+   "customerId": "n07",
+   "serviceId": "d6",
+   "staffId": "b3",
+   "date": "2026-09-18",
+   "time": "14:00",
+   "status": "done",
+   "courseId": "",
+   "note": "",
+   "createdAt": "2026-09-18",
+   "value": 1500000,
+   "commission": 150000,
+   "doneAt": "2026-09-18"
+  },
+  "e10": {
+   "customerId": "n04",
+   "serviceId": "d2",
+   "staffId": "b1",
+   "date": "2026-09-25",
+   "time": "09:00",
+   "status": "done",
+   "courseId": "",
+   "note": "",
+   "createdAt": "2026-09-25",
+   "value": 300000,
+   "commission": 30000,
+   "doneAt": "2026-09-25"
+  },
+  "e11": {
+   "customerId": "n08",
+   "serviceId": "d1",
+   "staffId": "b1",
+   "date": "2026-09-25",
+   "time": "10:00",
+   "status": "arrived",
+   "courseId": "",
+   "note": "",
+   "createdAt": "2026-09-25"
+  },
+  "e12": {
+   "customerId": "n05",
+   "serviceId": "d3",
+   "staffId": "b1",
+   "date": "2026-09-25",
+   "time": "14:00",
+   "status": "confirmed",
+   "courseId": "",
+   "note": "",
+   "createdAt": "2026-09-25"
+  },
+  "e20": {
+   "customerId": "n06",
+   "serviceId": "d5",
+   "staffId": "b2",
+   "date": "2026-09-26",
+   "time": "09:00",
+   "status": "booked",
+   "courseId": "m2",
+   "note": "",
+   "createdAt": "2026-09-26"
+  },
+  "e21": {
+   "customerId": "n08",
+   "serviceId": "d3",
+   "staffId": "b1",
+   "date": "2026-09-26",
+   "time": "15:00",
+   "status": "booked",
+   "courseId": "",
+   "note": "",
+   "createdAt": "2026-09-26"
+  }
+ },
+ "ws/nhakhoa/courses": {
+  "m1": {
+   "customerId": "n02",
+   "packageId": "q1",
+   "serviceId": "d5",
+   "name": "Niềng răng mắc cài",
+   "used": 10,
+   "total": 24,
+   "price": 35000000,
+   "startDate": "2025-11-20"
+  },
+  "m2": {
+   "customerId": "n06",
+   "packageId": "q1",
+   "serviceId": "d5",
+   "name": "Niềng răng mắc cài",
+   "used": 23,
+   "total": 24,
+   "price": 35000000,
+   "startDate": "2024-08-26"
+  }
+ },
+ "ws/nhakhoa/customers": {
+  "n01": {
+   "name": "Nguyễn Văn Hùng",
+   "phone": "0903111222",
+   "birthday": "1984-04-10",
+   "source": "Google Maps",
+   "tags": "",
+   "note": "",
+   "createdAt": "2026-03-20",
+   "xung": "anh"
+  },
+  "n02": {
+   "name": "Trần Thị Hồng",
+   "phone": "0913222333",
+   "birthday": "1996-06-06",
+   "source": "Facebook",
+   "tags": "",
+   "note": "Đang niềng răng",
+   "createdAt": "2025-11-20",
+   "xung": "chị"
+  },
+  "n03": {
+   "name": "Lê Quốc Bảo",
+   "phone": "0983444555",
+   "birthday": "1979-02-28",
+   "source": "Giới thiệu",
+   "tags": "",
+   "note": "Huyết áp cao",
+   "createdAt": "2026-03-28",
+   "xung": "anh"
+  },
+  "n04": {
+   "name": "Phạm Thu Trang",
+   "phone": "0934555666",
+   "birthday": "1998-09-27",
+   "source": "Facebook",
+   "tags": "",
+   "note": "",
+   "createdAt": "2026-09-25",
+   "xung": "chị"
+  },
+  "n05": {
+   "name": "Vũ Đức Minh",
+   "phone": "0977666777",
+   "birthday": "1992-11-30",
+   "source": "Zalo",
+   "tags": "",
+   "note": "",
+   "createdAt": "2026-09-15",
+   "xung": "anh"
+  },
+  "n06": {
+   "name": "Đinh Ngọc Mai",
+   "phone": "0946777888",
+   "birthday": "2003-05-05",
+   "source": "TikTok",
+   "tags": "",
+   "note": "Sắp tháo niềng",
+   "createdAt": "2024-08-26",
+   "xung": "chị"
+  },
+  "n07": {
+   "name": "Cao Thị Thu",
+   "phone": "0925888999",
+   "birthday": "1990-01-20",
+   "source": "Vãng lai",
+   "tags": "",
+   "note": "Dị ứng penicillin",
+   "createdAt": "2026-09-18",
+   "xung": "chị"
+  },
+  "n08": {
+   "name": "Lâm Gia Huy",
+   "phone": "0968999000",
+   "birthday": "2000-08-08",
+   "source": "Google Maps",
+   "tags": "",
+   "note": "",
+   "createdAt": "2026-09-25",
+   "xung": "anh"
+  }
+ },
+ "ws/nhakhoa/packages": {
+  "q1": {
+   "name": "Niềng răng mắc cài (24 lần tái khám)",
+   "serviceId": "d5",
+   "sessions": 24,
+   "price": 35000000
+  },
+  "q2": {
+   "name": "Cạo vôi 2 lần/năm",
+   "serviceId": "d2",
+   "sessions": 2,
+   "price": 500000
+  }
+ },
+ "ws/nhakhoa/payments": {
+  "y1": {
+   "customerId": "n01",
+   "saleId": "z1",
+   "amount": 300000,
+   "method": "cash",
+   "date": "2026-03-20",
+   "label": "Cạo vôi, đánh bóng",
+   "createdAt": 1
+  },
+  "y2": {
+   "customerId": "n03",
+   "saleId": "z2",
+   "amount": 150000,
+   "method": "cash",
+   "date": "2026-03-28",
+   "label": "Khám tổng quát",
+   "createdAt": 2
+  },
+  "y3": {
+   "customerId": "n05",
+   "saleId": "z3",
+   "amount": 500000,
+   "method": "transfer",
+   "date": "2026-09-15",
+   "label": "Trám răng thẩm mỹ",
+   "createdAt": 3
+  },
+  "y4": {
+   "customerId": "n07",
+   "saleId": "z4",
+   "amount": 1500000,
+   "method": "card",
+   "date": "2026-09-18",
+   "label": "Nhổ răng khôn",
+   "createdAt": 4
+  },
+  "y5": {
+   "customerId": "n04",
+   "saleId": "z5",
+   "amount": 300000,
+   "method": "transfer",
+   "date": "2026-09-25",
+   "label": "Cạo vôi, đánh bóng",
+   "createdAt": 5
+  },
+  "y6": {
+   "customerId": "n02",
+   "saleId": "z6",
+   "amount": 20000000,
+   "method": "transfer",
+   "date": "2025-11-20",
+   "label": "Niềng răng mắc cài",
+   "createdAt": 6
+  },
+  "y7": {
+   "customerId": "n06",
+   "saleId": "z7",
+   "amount": 35000000,
+   "method": "transfer",
+   "date": "2024-08-26",
+   "label": "Niềng răng mắc cài",
+   "createdAt": 7
+  }
+ },
+ "ws/nhakhoa/sales": {
+  "z1": {
+   "customerId": "n01",
+   "date": "2026-03-20",
+   "label": "Cạo vôi, đánh bóng",
+   "total": 300000,
+   "paid": 300000,
+   "kind": "service",
+   "courseId": "",
+   "staffId": "",
+   "createdAt": 0
+  },
+  "z2": {
+   "customerId": "n03",
+   "date": "2026-03-28",
+   "label": "Khám tổng quát",
+   "total": 150000,
+   "paid": 150000,
+   "kind": "service",
+   "courseId": "",
+   "staffId": "",
+   "createdAt": 0
+  },
+  "z3": {
+   "customerId": "n05",
+   "date": "2026-09-15",
+   "label": "Trám răng thẩm mỹ",
+   "total": 500000,
+   "paid": 500000,
+   "kind": "service",
+   "courseId": "",
+   "staffId": "",
+   "createdAt": 0
+  },
+  "z4": {
+   "customerId": "n07",
+   "date": "2026-09-18",
+   "label": "Nhổ răng khôn",
+   "total": 1500000,
+   "paid": 1500000,
+   "kind": "service",
+   "courseId": "",
+   "staffId": "",
+   "createdAt": 0
+  },
+  "z5": {
+   "customerId": "n04",
+   "date": "2026-09-25",
+   "label": "Cạo vôi, đánh bóng",
+   "total": 300000,
+   "paid": 300000,
+   "kind": "service",
+   "courseId": "",
+   "staffId": "",
+   "createdAt": 0
+  },
+  "z6": {
+   "customerId": "n02",
+   "date": "2025-11-20",
+   "label": "Niềng răng mắc cài",
+   "total": 35000000,
+   "paid": 20000000,
+   "kind": "course",
+   "courseId": "m1",
+   "staffId": "",
+   "createdAt": 0
+  },
+  "z7": {
+   "customerId": "n06",
+   "date": "2024-08-26",
+   "label": "Niềng răng mắc cài",
+   "total": 35000000,
+   "paid": 35000000,
+   "kind": "course",
+   "courseId": "m2",
+   "staffId": "",
+   "createdAt": 0
+  }
+ },
+ "ws/nhakhoa/services": {
+  "d1": {
+   "name": "Khám tổng quát",
+   "price": 150000,
+   "duration": 30,
+   "commissionPct": 0,
+   "recallDays": 180
+  },
+  "d2": {
+   "name": "Cạo vôi, đánh bóng",
+   "price": 300000,
+   "duration": 30,
+   "commissionPct": 10,
+   "recallDays": 180
+  },
+  "d3": {
+   "name": "Trám răng thẩm mỹ",
+   "price": 500000,
+   "duration": 45,
+   "commissionPct": 10,
+   "recallDays": 365
+  },
+  "d4": {
+   "name": "Tẩy trắng răng",
+   "price": 2500000,
+   "duration": 60,
+   "commissionPct": 8,
+   "recallDays": 365
+  },
+  "d5": {
+   "name": "Tái khám niềng răng",
+   "price": 200000,
+   "duration": 30,
+   "commissionPct": 10,
+   "recallDays": 30
+  },
+  "d6": {
+   "name": "Nhổ răng khôn",
+   "price": 1500000,
+   "duration": 60,
+   "commissionPct": 10,
+   "recallDays": 7
+  }
+ },
+ "ws/spa/appointments": {
+  "a01": {
+   "customerId": "c02",
+   "serviceId": "s3",
+   "staffId": "st1",
+   "date": "2026-09-10",
+   "time": "10:00",
+   "status": "done",
+   "courseId": "k2",
+   "note": "",
+   "createdAt": "2026-09-10",
+   "value": 300000,
+   "commission": 24000,
+   "doneAt": "2026-09-10"
+  },
+  "a02": {
+   "customerId": "c05",
+   "serviceId": "s1",
+   "staffId": "st1",
+   "date": "2026-09-12",
+   "time": "15:00",
+   "status": "done",
+   "courseId": "k3",
+   "note": "",
+   "createdAt": "2026-09-12",
+   "value": 291667,
+   "commission": 29167,
+   "doneAt": "2026-09-12"
+  },
+  "a03": {
+   "customerId": "c10",
+   "serviceId": "s3",
+   "staffId": "st3",
+   "date": "2026-09-18",
+   "time": "11:00",
+   "status": "done",
+   "courseId": "k5",
+   "note": "",
+   "createdAt": "2026-09-18",
+   "value": 300000,
+   "commission": 24000,
+   "doneAt": "2026-09-18"
+  },
+  "a04": {
+   "customerId": "c04",
+   "serviceId": "s5",
+   "staffId": "st2",
+   "date": "2026-08-15",
+   "time": "16:00",
+   "status": "done",
+   "courseId": "",
+   "note": "",
+   "createdAt": "2026-08-15",
+   "value": 450000,
+   "commission": 67500,
+   "doneAt": "2026-08-15"
+  },
+  "a05": {
+   "customerId": "c06",
+   "serviceId": "s1",
+   "staffId": "st1",
+   "date": "2026-08-20",
+   "time": "10:00",
+   "status": "done",
+   "courseId": "",
+   "note": "",
+   "createdAt": "2026-08-20",
+   "value": 350000,
+   "commission": 35000,
+   "doneAt": "2026-08-20"
+  },
+  "a06": {
+   "customerId": "c08",
+   "serviceId": "s4",
+   "staffId": "st4",
+   "date": "2026-09-05",
+   "time": "18:00",
+   "status": "done",
+   "courseId": "",
+   "note": "",
+   "createdAt": "2026-09-05",
+   "value": 150000,
+   "commission": 22500,
+   "doneAt": "2026-09-05"
+  },
+  "a07": {
+   "customerId": "c09",
+   "serviceId": "s8",
+   "staffId": "st3",
+   "date": "2026-09-01",
+   "time": "14:00",
+   "status": "done",
+   "courseId": "",
+   "note": "",
+   "createdAt": "2026-09-01",
+   "value": 300000,
+   "commission": 36000,
+   "doneAt": "2026-09-01"
+  },
+  "a08": {
+   "customerId": "c11",
+   "serviceId": "s6",
+   "staffId": "st1",
+   "date": "2026-09-19",
+   "time": "09:30",
+   "status": "done",
+   "courseId": "",
+   "note": "",
+   "createdAt": "2026-09-19",
+   "value": 700000,
+   "commission": 70000,
+   "doneAt": "2026-09-19"
+  },
+  "a09": {
+   "customerId": "c12",
+   "serviceId": "s5",
+   "staffId": "st2",
+   "date": "2026-09-20",
+   "time": "17:00",
+   "status": "done",
+   "courseId": "",
+   "note": "",
+   "createdAt": "2026-09-20",
+   "value": 450000,
+   "commission": 67500,
+   "doneAt": "2026-09-20"
+  },
+  "a10": {
+   "customerId": "c14",
+   "serviceId": "s4",
+   "staffId": "st4",
+   "date": "2026-09-21",
+   "time": "10:00",
+   "status": "done",
+   "courseId": "",
+   "note": "",
+   "createdAt": "2026-09-21",
+   "value": 150000,
+   "commission": 22500,
+   "doneAt": "2026-09-21"
+  },
+  "a11": {
+   "customerId": "c03",
+   "serviceId": "s1",
+   "staffId": "st1",
+   "date": "2026-09-22",
+   "time": "14:30",
+   "status": "done",
+   "courseId": "",
+   "note": "",
+   "createdAt": "2026-09-22",
+   "value": 350000,
+   "commission": 35000,
+   "doneAt": "2026-09-22"
+  },
+  "a12": {
+   "customerId": "c16",
+   "serviceId": "s5",
+   "staffId": "st2",
+   "date": "2026-09-23",
+   "time": "19:00",
+   "status": "done",
+   "courseId": "",
+   "note": "",
+   "createdAt": "2026-09-23",
+   "value": 450000,
+   "commission": 67500,
+   "doneAt": "2026-09-23"
+  },
+  "a13": {
+   "customerId": "c01",
+   "serviceId": "s2",
+   "staffId": "st1",
+   "date": "2026-09-23",
+   "time": "09:00",
+   "status": "done",
+   "courseId": "k1",
+   "note": "",
+   "createdAt": "2026-09-23",
+   "value": 450000,
+   "commission": 54000,
+   "doneAt": "2026-09-23"
+  },
+  "a14": {
+   "customerId": "c07",
+   "serviceId": "s2",
+   "staffId": "st1",
+   "date": "2026-09-24",
+   "time": "10:30",
+   "status": "done",
+   "courseId": "k4",
+   "note": "",
+   "createdAt": "2026-09-24",
+   "value": 450000,
+   "commission": 54000,
+   "doneAt": "2026-09-24"
+  },
+  "a15": {
+   "customerId": "c12",
+   "serviceId": "s8",
+   "staffId": "st3",
+   "date": "2026-09-24",
+   "time": "15:00",
+   "status": "noshow",
+   "courseId": "",
+   "note": "",
+   "createdAt": "2026-09-24"
+  },
+  "a20": {
+   "customerId": "c13",
+   "serviceId": "s1",
+   "staffId": "st1",
+   "date": "2026-09-25",
+   "time": "09:00",
+   "status": "done",
+   "courseId": "k6",
+   "note": "",
+   "createdAt": "2026-09-25",
+   "value": 291667,
+   "commission": 29167,
+   "doneAt": "2026-09-25"
+  },
+  "a21": {
+   "customerId": "c15",
+   "serviceId": "s2",
+   "staffId": "st1",
+   "date": "2026-09-25",
+   "time": "10:30",
+   "status": "arrived",
+   "courseId": "k7",
+   "note": "",
+   "createdAt": "2026-09-25"
+  },
+  "a22": {
+   "customerId": "c03",
+   "serviceId": "s4",
+   "staffId": "st4",
+   "date": "2026-09-25",
+   "time": "11:00",
+   "status": "confirmed",
+   "courseId": "",
+   "note": "",
+   "createdAt": "2026-09-25"
+  },
+  "a23": {
+   "customerId": "c14",
+   "serviceId": "s8",
+   "staffId": "st3",
+   "date": "2026-09-25",
+   "time": "14:00",
+   "status": "confirmed",
+   "courseId": "",
+   "note": "",
+   "createdAt": "2026-09-25"
+  },
+  "a24": {
+   "customerId": "c11",
+   "serviceId": "s5",
+   "staffId": "st2",
+   "date": "2026-09-25",
+   "time": "15:30",
+   "status": "booked",
+   "courseId": "",
+   "note": "",
+   "createdAt": "2026-09-25"
+  },
+  "a25": {
+   "customerId": "c16",
+   "serviceId": "s4",
+   "staffId": "st4",
+   "date": "2026-09-25",
+   "time": "17:00",
+   "status": "booked",
+   "courseId": "",
+   "note": "",
+   "createdAt": "2026-09-25"
+  },
+  "a30": {
+   "customerId": "c01",
+   "serviceId": "s2",
+   "staffId": "st1",
+   "date": "2026-09-26",
+   "time": "09:30",
+   "status": "booked",
+   "courseId": "k1",
+   "note": "",
+   "createdAt": "2026-09-26"
+  },
+  "a31": {
+   "customerId": "c12",
+   "serviceId": "s1",
+   "staffId": "st1",
+   "date": "2026-09-26",
+   "time": "11:00",
+   "status": "booked",
+   "courseId": "",
+   "note": "",
+   "createdAt": "2026-09-26"
+  },
+  "a32": {
+   "customerId": "c14",
+   "serviceId": "s5",
+   "staffId": "st2",
+   "date": "2026-09-26",
+   "time": "14:00",
+   "status": "confirmed",
+   "courseId": "",
+   "note": "",
+   "createdAt": "2026-09-26"
+  },
+  "a33": {
+   "customerId": "c03",
+   "serviceId": "s8",
+   "staffId": "st3",
+   "date": "2026-09-26",
+   "time": "15:00",
+   "status": "booked",
+   "courseId": "",
+   "note": "",
+   "createdAt": "2026-09-26"
+  },
+  "a34": {
+   "customerId": "c09",
+   "serviceId": "s1",
+   "staffId": "st1",
+   "date": "2026-09-26",
+   "time": "16:30",
+   "status": "booked",
+   "courseId": "",
+   "note": "",
+   "createdAt": "2026-09-26"
+  },
+  "a40": {
+   "customerId": "c07",
+   "serviceId": "s2",
+   "staffId": "st1",
+   "date": "2026-09-27",
+   "time": "10:00",
+   "status": "booked",
+   "courseId": "k4",
+   "note": "",
+   "createdAt": "2026-09-27"
+  },
+  "a41": {
+   "customerId": "c13",
+   "serviceId": "s6",
+   "staffId": "st1",
+   "date": "2026-09-27",
+   "time": "14:00",
+   "status": "booked",
+   "courseId": "",
+   "note": "",
+   "createdAt": "2026-09-27"
+  },
+  "a42": {
+   "customerId": "c11",
+   "serviceId": "s4",
+   "staffId": "st4",
+   "date": "2026-09-27",
+   "time": "09:00",
+   "status": "booked",
+   "courseId": "",
+   "note": "",
+   "createdAt": "2026-09-27"
+  },
+  "a43": {
+   "customerId": "c16",
+   "serviceId": "s5",
+   "staffId": "st2",
+   "date": "2026-09-28",
+   "time": "18:00",
+   "status": "booked",
+   "courseId": "",
+   "note": "",
+   "createdAt": "2026-09-28"
+  }
+ },
+ "ws/spa/courses": {
+  "k1": {
+   "customerId": "c01",
+   "packageId": "p1",
+   "serviceId": "s2",
+   "name": "Trị mụn 10 buổi",
+   "used": 8,
+   "total": 10,
+   "price": 4500000,
+   "startDate": "2026-07-20"
+  },
+  "k2": {
+   "customerId": "c02",
+   "packageId": "p2",
+   "serviceId": "s3",
+   "name": "Triệt lông nách 8 buổi",
+   "used": 3,
+   "total": 8,
+   "price": 2400000,
+   "startDate": "2026-08-10"
+  },
+  "k3": {
+   "customerId": "c05",
+   "packageId": "p3",
+   "serviceId": "s1",
+   "name": "Chăm sóc da 12 buổi",
+   "used": 5,
+   "total": 12,
+   "price": 3500000,
+   "startDate": "2026-08-01"
+  },
+  "k4": {
+   "customerId": "c07",
+   "packageId": "p1",
+   "serviceId": "s2",
+   "name": "Trị mụn 10 buổi",
+   "used": 2,
+   "total": 10,
+   "price": 4500000,
+   "startDate": "2026-09-10"
+  },
+  "k5": {
+   "customerId": "c10",
+   "packageId": "p2",
+   "serviceId": "s3",
+   "name": "Triệt lông nách 8 buổi",
+   "used": 7,
+   "total": 8,
+   "price": 2400000,
+   "startDate": "2026-07-05"
+  },
+  "k6": {
+   "customerId": "c13",
+   "packageId": "p3",
+   "serviceId": "s1",
+   "name": "Chăm sóc da 12 buổi",
+   "used": 11,
+   "total": 12,
+   "price": 3500000,
+   "startDate": "2026-06-20"
+  },
+  "k7": {
+   "customerId": "c15",
+   "packageId": "p1",
+   "serviceId": "s2",
+   "name": "Trị mụn 10 buổi",
+   "used": 0,
+   "total": 10,
+   "price": 4500000,
+   "startDate": "2026-09-25"
+  }
+ },
+ "ws/spa/customers": {
+  "c01": {
+   "name": "Nguyễn Thị Lan",
+   "phone": "0901234567",
+   "birthday": "1992-09-28",
+   "source": "Facebook",
+   "tags": "VIP",
+   "note": "Da dầu, mụn ẩn vùng cằm",
+   "createdAt": "2026-07-18",
+   "xung": "chị"
+  },
+  "c02": {
+   "name": "Trần Minh Anh",
+   "phone": "0912345678",
+   "birthday": "1995-03-12",
+   "source": "Zalo",
+   "tags": "",
+   "note": "",
+   "createdAt": "2026-08-10",
+   "xung": "chị"
+  },
+  "c03": {
+   "name": "Lê Thu Hà",
+   "phone": "0987654321",
+   "birthday": "1990-10-01",
+   "source": "Giới thiệu",
+   "tags": "",
+   "note": "Thích phòng yên tĩnh",
+   "createdAt": "2026-06-02",
+   "xung": "chị"
+  },
+  "c04": {
+   "name": "Phạm Ngọc Trâm",
+   "phone": "0934567890",
+   "birthday": "1988-05-20",
+   "source": "Google Maps",
+   "tags": "",
+   "note": "",
+   "createdAt": "2026-08-15",
+   "xung": "chị"
+  },
+  "c05": {
+   "name": "Hoàng Bảo Ngọc",
+   "phone": "0976543210",
+   "birthday": "1997-12-02",
+   "source": "Facebook",
+   "tags": "",
+   "note": "Da nhạy cảm, tránh AHA",
+   "createdAt": "2026-08-01",
+   "xung": "chị"
+  },
+  "c06": {
+   "name": "Võ Thị Kim Chi",
+   "phone": "0945678901",
+   "birthday": "1985-01-15",
+   "source": "Vãng lai",
+   "tags": "",
+   "note": "",
+   "createdAt": "2026-08-20",
+   "xung": "chị"
+  },
+  "c07": {
+   "name": "Đặng Phương Thảo",
+   "phone": "0923456789",
+   "birthday": "1999-07-07",
+   "source": "TikTok",
+   "tags": "",
+   "note": "",
+   "createdAt": "2026-09-10",
+   "xung": "chị"
+  },
+  "c08": {
+   "name": "Bùi Thanh Tâm",
+   "phone": "0967890123",
+   "birthday": "1993-11-11",
+   "source": "Zalo",
+   "tags": "",
+   "note": "",
+   "createdAt": "2026-07-01",
+   "xung": "chị"
+  },
+  "c09": {
+   "name": "Đỗ Hải Yến",
+   "phone": "0958765432",
+   "birthday": "1996-04-22",
+   "source": "Facebook",
+   "tags": "Hay đi cùng bạn",
+   "note": "",
+   "createdAt": "2026-08-02",
+   "xung": "chị"
+  },
+  "c10": {
+   "name": "Ngô Mỹ Linh",
+   "phone": "0909876543",
+   "birthday": "1991-02-14",
+   "source": "Giới thiệu",
+   "tags": "",
+   "note": "",
+   "createdAt": "2026-07-05",
+   "xung": "chị"
+  },
+  "c11": {
+   "name": "Dương Quỳnh Như",
+   "phone": "0938765123",
+   "birthday": "1994-08-30",
+   "source": "Google Maps",
+   "tags": "VIP",
+   "note": "",
+   "createdAt": "2026-05-12",
+   "xung": "chị"
+  },
+  "c12": {
+   "name": "Lý Hoàng Oanh",
+   "phone": "0916789345",
+   "birthday": "1989-06-18",
+   "source": "Facebook",
+   "tags": "",
+   "note": "",
+   "createdAt": "2026-09-01",
+   "xung": "chị"
+  },
+  "c13": {
+   "name": "Trịnh Gia Hân",
+   "phone": "0981234765",
+   "birthday": "2000-10-09",
+   "source": "Zalo",
+   "tags": "",
+   "note": "",
+   "createdAt": "2026-06-20",
+   "xung": "chị"
+  },
+  "c14": {
+   "name": "Mai Thùy Dung",
+   "phone": "0907654890",
+   "birthday": "1987-03-03",
+   "source": "Vãng lai",
+   "tags": "",
+   "note": "",
+   "createdAt": "2026-09-21",
+   "xung": "chị"
+  },
+  "c15": {
+   "name": "Phan Anh Thư",
+   "phone": "0935678234",
+   "birthday": "2001-09-19",
+   "source": "Facebook",
+   "tags": "Khách mới",
+   "note": "Mụn viêm, da mỏng",
+   "createdAt": "2026-09-25",
+   "xung": "chị"
+  },
+  "c16": {
+   "name": "Hồ Minh Quân",
+   "phone": "0918234567",
+   "birthday": "1990-12-25",
+   "source": "Giới thiệu",
+   "tags": "",
+   "note": "Thích massage lực mạnh",
+   "createdAt": "2026-08-23",
+   "xung": "anh"
+  }
+ },
+ "ws/spa/packages": {
+  "p1": {
+   "name": "Trị mụn 10 buổi",
+   "serviceId": "s2",
+   "sessions": 10,
+   "price": 4500000
+  },
+  "p2": {
+   "name": "Triệt lông nách 8 buổi",
+   "serviceId": "s3",
+   "sessions": 8,
+   "price": 2400000
+  },
+  "p3": {
+   "name": "Chăm sóc da 12 buổi",
+   "serviceId": "s1",
+   "sessions": 12,
+   "price": 3500000
+  }
+ },
+ "ws/spa/payments": {
+  "y1": {
+   "customerId": "c01",
+   "saleId": "x1",
+   "amount": 4500000,
+   "method": "transfer",
+   "date": "2026-07-20",
+   "label": "Trị mụn 10 buổi",
+   "createdAt": 1
+  },
+  "y10": {
+   "customerId": "c08",
+   "saleId": "x10",
+   "amount": 150000,
+   "method": "cash",
+   "date": "2026-09-05",
+   "label": "Gội đầu dưỡng sinh",
+   "createdAt": 10
+  },
+  "y11": {
+   "customerId": "c09",
+   "saleId": "x11",
+   "amount": 300000,
+   "method": "transfer",
+   "date": "2026-09-01",
+   "label": "Nối mi",
+   "createdAt": 11
+  },
+  "y12": {
+   "customerId": "c11",
+   "saleId": "x12",
+   "amount": 700000,
+   "method": "card",
+   "date": "2026-09-19",
+   "label": "Peel da sinh học",
+   "createdAt": 12
+  },
+  "y13": {
+   "customerId": "c12",
+   "saleId": "x13",
+   "amount": 450000,
+   "method": "transfer",
+   "date": "2026-09-20",
+   "label": "Massage body đá nóng",
+   "createdAt": 13
+  },
+  "y14": {
+   "customerId": "c14",
+   "saleId": "x14",
+   "amount": 150000,
+   "method": "cash",
+   "date": "2026-09-21",
+   "label": "Gội đầu dưỡng sinh",
+   "createdAt": 14
+  },
+  "y15": {
+   "customerId": "c03",
+   "saleId": "x15",
+   "amount": 350000,
+   "method": "transfer",
+   "date": "2026-09-22",
+   "label": "Chăm sóc da cơ bản",
+   "createdAt": 15
+  },
+  "y16": {
+   "customerId": "c16",
+   "saleId": "x16",
+   "amount": 250000,
+   "method": "cash",
+   "date": "2026-09-23",
+   "label": "Massage body đá nóng",
+   "createdAt": 16
+  },
+  "y17": {
+   "customerId": "c02",
+   "saleId": "x2",
+   "amount": 300000,
+   "method": "cash",
+   "date": "2026-09-24",
+   "label": "Thu nợ: Triệt lông nách 8 buổi",
+   "createdAt": 17
+  },
+  "y2": {
+   "customerId": "c02",
+   "saleId": "x2",
+   "amount": 1500000,
+   "method": "cash",
+   "date": "2026-08-10",
+   "label": "Triệt lông nách 8 buổi",
+   "createdAt": 2
+  },
+  "y3": {
+   "customerId": "c05",
+   "saleId": "x3",
+   "amount": 3500000,
+   "method": "card",
+   "date": "2026-08-01",
+   "label": "Chăm sóc da 12 buổi",
+   "createdAt": 3
+  },
+  "y4": {
+   "customerId": "c07",
+   "saleId": "x4",
+   "amount": 2000000,
+   "method": "transfer",
+   "date": "2026-09-10",
+   "label": "Trị mụn 10 buổi",
+   "createdAt": 4
+  },
+  "y5": {
+   "customerId": "c10",
+   "saleId": "x5",
+   "amount": 2400000,
+   "method": "cash",
+   "date": "2026-07-05",
+   "label": "Triệt lông nách 8 buổi",
+   "createdAt": 5
+  },
+  "y6": {
+   "customerId": "c13",
+   "saleId": "x6",
+   "amount": 3500000,
+   "method": "transfer",
+   "date": "2026-06-20",
+   "label": "Chăm sóc da 12 buổi",
+   "createdAt": 6
+  },
+  "y7": {
+   "customerId": "c15",
+   "saleId": "x7",
+   "amount": 3000000,
+   "method": "transfer",
+   "date": "2026-09-25",
+   "label": "Trị mụn 10 buổi",
+   "createdAt": 7
+  },
+  "y8": {
+   "customerId": "c04",
+   "saleId": "x8",
+   "amount": 450000,
+   "method": "cash",
+   "date": "2026-08-15",
+   "label": "Massage body đá nóng",
+   "createdAt": 8
+  },
+  "y9": {
+   "customerId": "c06",
+   "saleId": "x9",
+   "amount": 350000,
+   "method": "cash",
+   "date": "2026-08-20",
+   "label": "Chăm sóc da cơ bản",
+   "createdAt": 9
+  }
+ },
+ "ws/spa/sales": {
+  "x1": {
+   "customerId": "c01",
+   "date": "2026-07-20",
+   "label": "Trị mụn 10 buổi",
+   "total": 4500000,
+   "paid": 4500000,
+   "kind": "course",
+   "courseId": "k1",
+   "staffId": "",
+   "createdAt": 0
+  },
+  "x10": {
+   "customerId": "c08",
+   "date": "2026-09-05",
+   "label": "Gội đầu dưỡng sinh",
+   "total": 150000,
+   "paid": 150000,
+   "kind": "service",
+   "courseId": "",
+   "staffId": "",
+   "createdAt": 0
+  },
+  "x11": {
+   "customerId": "c09",
+   "date": "2026-09-01",
+   "label": "Nối mi",
+   "total": 300000,
+   "paid": 300000,
+   "kind": "service",
+   "courseId": "",
+   "staffId": "",
+   "createdAt": 0
+  },
+  "x12": {
+   "customerId": "c11",
+   "date": "2026-09-19",
+   "label": "Peel da sinh học",
+   "total": 700000,
+   "paid": 700000,
+   "kind": "service",
+   "courseId": "",
+   "staffId": "",
+   "createdAt": 0
+  },
+  "x13": {
+   "customerId": "c12",
+   "date": "2026-09-20",
+   "label": "Massage body đá nóng",
+   "total": 450000,
+   "paid": 450000,
+   "kind": "service",
+   "courseId": "",
+   "staffId": "",
+   "createdAt": 0
+  },
+  "x14": {
+   "customerId": "c14",
+   "date": "2026-09-21",
+   "label": "Gội đầu dưỡng sinh",
+   "total": 150000,
+   "paid": 150000,
+   "kind": "service",
+   "courseId": "",
+   "staffId": "",
+   "createdAt": 0
+  },
+  "x15": {
+   "customerId": "c03",
+   "date": "2026-09-22",
+   "label": "Chăm sóc da cơ bản",
+   "total": 350000,
+   "paid": 350000,
+   "kind": "service",
+   "courseId": "",
+   "staffId": "",
+   "createdAt": 0
+  },
+  "x16": {
+   "customerId": "c16",
+   "date": "2026-09-23",
+   "label": "Massage body đá nóng",
+   "total": 450000,
+   "paid": 250000,
+   "kind": "service",
+   "courseId": "",
+   "staffId": "",
+   "createdAt": 0
+  },
+  "x2": {
+   "customerId": "c02",
+   "date": "2026-08-10",
+   "label": "Triệt lông nách 8 buổi",
+   "total": 2400000,
+   "paid": 1800000,
+   "kind": "course",
+   "courseId": "k2",
+   "staffId": "",
+   "createdAt": 0
+  },
+  "x3": {
+   "customerId": "c05",
+   "date": "2026-08-01",
+   "label": "Chăm sóc da 12 buổi",
+   "total": 3500000,
+   "paid": 3500000,
+   "kind": "course",
+   "courseId": "k3",
+   "staffId": "",
+   "createdAt": 0
+  },
+  "x4": {
+   "customerId": "c07",
+   "date": "2026-09-10",
+   "label": "Trị mụn 10 buổi",
+   "total": 4500000,
+   "paid": 2000000,
+   "kind": "course",
+   "courseId": "k4",
+   "staffId": "",
+   "createdAt": 0
+  },
+  "x5": {
+   "customerId": "c10",
+   "date": "2026-07-05",
+   "label": "Triệt lông nách 8 buổi",
+   "total": 2400000,
+   "paid": 2400000,
+   "kind": "course",
+   "courseId": "k5",
+   "staffId": "",
+   "createdAt": 0
+  },
+  "x6": {
+   "customerId": "c13",
+   "date": "2026-06-20",
+   "label": "Chăm sóc da 12 buổi",
+   "total": 3500000,
+   "paid": 3500000,
+   "kind": "course",
+   "courseId": "k6",
+   "staffId": "",
+   "createdAt": 0
+  },
+  "x7": {
+   "customerId": "c15",
+   "date": "2026-09-25",
+   "label": "Trị mụn 10 buổi",
+   "total": 4500000,
+   "paid": 3000000,
+   "kind": "course",
+   "courseId": "k7",
+   "staffId": "",
+   "createdAt": 0
+  },
+  "x8": {
+   "customerId": "c04",
+   "date": "2026-08-15",
+   "label": "Massage body đá nóng",
+   "total": 450000,
+   "paid": 450000,
+   "kind": "service",
+   "courseId": "",
+   "staffId": "",
+   "createdAt": 0
+  },
+  "x9": {
+   "customerId": "c06",
+   "date": "2026-08-20",
+   "label": "Chăm sóc da cơ bản",
+   "total": 350000,
+   "paid": 350000,
+   "kind": "service",
+   "courseId": "",
+   "staffId": "",
+   "createdAt": 0
+  }
+ },
+ "ws/spa/services": {
+  "s1": {
+   "name": "Chăm sóc da cơ bản",
+   "price": 350000,
+   "duration": 60,
+   "commissionPct": 10,
+   "recallDays": 30
+  },
+  "s2": {
+   "name": "Trị mụn chuyên sâu",
+   "price": 550000,
+   "duration": 75,
+   "commissionPct": 12,
+   "recallDays": 21
+  },
+  "s3": {
+   "name": "Triệt lông nách",
+   "price": 400000,
+   "duration": 30,
+   "commissionPct": 8,
+   "recallDays": 30
+  },
+  "s4": {
+   "name": "Gội đầu dưỡng sinh",
+   "price": 150000,
+   "duration": 45,
+   "commissionPct": 15,
+   "recallDays": 14
+  },
+  "s5": {
+   "name": "Massage body đá nóng",
+   "price": 450000,
+   "duration": 90,
+   "commissionPct": 15,
+   "recallDays": 30
+  },
+  "s6": {
+   "name": "Peel da sinh học",
+   "price": 700000,
+   "duration": 60,
+   "commissionPct": 10,
+   "recallDays": 45
+  },
+  "s7": {
+   "name": "Phun mày tán bột",
+   "price": 2500000,
+   "duration": 120,
+   "commissionPct": 5,
+   "recallDays": 180
+  },
+  "s8": {
+   "name": "Nối mi",
+   "price": 300000,
+   "duration": 60,
+   "commissionPct": 12,
+   "recallDays": 21
+  }
+ }
+}</script>
+</head>
+<body>
+<div class="app">
+  <nav class="rail" id="rail" aria-label="Điều hướng"></nav>
+  <div class="main">
+    <header class="topbar"><div class="topbar-in">
+      <div class="brand" id="brand">VUA APP<small>Đang tải…</small></div>
+      <div class="spacer"></div>
+      <div class="mode-pill" role="group" aria-label="Chế độ ngành">
+        <button type="button" data-act="mode" data-mode="spa" id="m-spa">Spa</button>
+        <button type="button" data-act="mode" data-mode="nhakhoa" id="m-nk">Nha khoa</button>
+      </div>
+      <button class="icon-btn" type="button" data-act="settings" aria-label="Cài đặt">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      </button>
+    </div></header>
+    <main class="content" id="view" aria-live="polite"></main>
+  </div>
+</div>
+<nav class="tabbar" id="tabbar" aria-label="Điều hướng"></nav>
+<div id="sheet" hidden></div>
+<div id="toast" hidden></div>
+
+<script>
+(function(){
+"use strict";
+/* ---------- helpers ---------- */
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=n=>Math.round(Number(n)||0).toLocaleString('vi-VN')+'đ';
+const pad=n=>String(n).padStart(2,'0');
+const ymd=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parseYmd=s=>{const p=String(s||'').split('-').map(Number);return new Date(p[0],(p[1]||1)-1,p[2]||1)};
+const addDays=(s,n)=>{const d=parseYmd(s);d.setDate(d.getDate()+n);return ymd(d)};
+const dm=s=>{if(!s)return '';const d=parseYmd(s);return pad(d.getDate())+'/'+pad(d.getMonth()+1)};
+const daysBetween=(a,b)=>Math.round((parseYmd(b)-parseYmd(a))/864e5);
+const WD=['CN','T2','T3','T4','T5','T6','T7'];
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const TODAY=ymd(new Date());
+const toMin=t=>{const p=String(t||'0:0').split(':').map(Number);return p[0]*60+(p[1]||0)};
+const initials=n=>{const w=String(n||'?').trim().split(/\s+/);return ((w.length>1?w[w.length-2][0]:'')+w[w.length-1][0]).toUpperCase()};
+const firstName=n=>{const w=String(n||'').trim().split(/\s+/);return w[w.length-1]||''};
+const phoneFmt=p=>String(p||'').replace(/\D/g,'').replace(/^(\d{4})(\d{3})(\d+)$/,'$1 $2 $3');
+const zaloUrl=p=>'https://zalo.me/'+String(p||'').replace(/\D/g,'');
+const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d');
+
+const COLS=['settings','services','staff','packages','customers','appointments','courses','sales','payments','contacts','attendance','advances'];
+const TERMS={
+  spa:{org:'Spa',customer:'Khách hàng',cust:'khách',staff:'Kỹ thuật viên',course:'Liệu trình',visit:'buổi',recall:'Lâu chưa quay lại',recallSub:'Đã quá thời gian thường quay lại, chưa có lịch mới',xung:'chị'},
+  nhakhoa:{org:'Nha khoa',customer:'Bệnh nhân',cust:'bệnh nhân',staff:'Bác sĩ',course:'Phác đồ',visit:'lần',recall:'Đến hạn tái khám',recallSub:'Đã đến hạn tái khám theo dịch vụ, chưa có lịch hẹn',xung:'anh/chị'}
+};
+const STATUS={booked:'Đã đặt',confirmed:'Đã xác nhận',arrived:'Đang phục vụ',done:'Hoàn thành',noshow:'Không đến',cancelled:'Đã hủy'};
+const METHODS={cash:'Tiền mặt',transfer:'Chuyển khoản',card:'Thẻ'};
+const SOURCES=['Facebook','Zalo','Giới thiệu','Google Maps','Vãng lai','TikTok'];
+const ICONS={
+ today:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>',
+ appts:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
+ customers:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg>',
+ pos:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20M6 15h4"/></svg>',
+ report:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
+ hr:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="15" rx="2"/><circle cx="9" cy="11.5" r="2.5"/><path d="M5.5 17a3.5 3.5 0 0 1 7 0M15 10h3M15 14h3"/></svg>',
+ search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>'
+};
+const TABS=[['today','Hôm nay'],['appts','Lịch hẹn'],['customers','Khách'],['pos','Thu tiền'],['report','Báo cáo'],['hr','Nhân sự']];
+
+/* ---------- state ---------- */
+let mode='spa'; try{mode=localStorage.getItem('vua-mode')||'spa'}catch(e){}
+if(!TERMS[mode]) mode='spa';
+const S={tab:'today',data:{},ready:false,dbOk:null,apptDate:TODAY,apptStaff:'all',custQ:'',custF:'all',period:'today',
+  pos:{kind:'service',customerId:'',q:'',serviceId:'',packageId:'',saleId:'',amount:'',paid:'',method:'cash',staffId:'',note:'',newName:'',newPhone:'',adding:false},
+  hr:{view:'overview',date:TODAY,month:TODAY.slice(0,7)},sheetView:null};
+COLS.forEach(c=>S.data[c]=new Map());
+let db=null, unsubs=[];
+const T=()=>TERMS[mode];
+const all=c=>Array.from(S.data[c].values());
+const get=(c,id)=>S.data[c].get(id);
+const settings=()=>get('settings','main')||{name:mode==='spa'?'Spa của bạn':'Nha khoa của bạn'};
+const serviceName=id=>(get('services',id)||{}).name||'Dịch vụ';
+const staffOf=id=>get('staff',id)||{name:'Chưa chọn',color:'#999'};
+
+/* ---------- data layer ---------- */
+function localKey(){return 'vua-local-'+mode}
+function loadLocal(){try{const raw=JSON.parse(localStorage.getItem(localKey())||'{}');COLS.forEach(c=>S.data[c]=new Map(Object.entries(raw[c]||{}).map(([k,v])=>[k,{...v,id:k}])))}catch(e){}}
+function saveLocal(){try{const o={};COLS.forEach(c=>{o[c]={};S.data[c].forEach((v,k)=>o[c][k]=v)});localStorage.setItem(localKey(),JSON.stringify(o))}catch(e){}}
+function subscribe(){
+  unsubs.forEach(u=>{try{u()}catch(e){}});unsubs=[];
+  COLS.forEach(c=>S.data[c]=new Map());S.ready=false;
+  if(!db){loadLocal();
+    if(!S.data.customers.size){const m0=mode;(()=>{const el=document.getElementById('seed-data');if(el){try{return Promise.resolve(JSON.parse(el.textContent))}catch(e){}}return fetch('seed.json').then(r=>r.ok?r.json():null)})().then(j=>{if(!j||m0!==mode||S.data.customers.size)return;COLS.forEach(c=>{const m=j[`ws/${mode}/${c}`]||{};S.data[c]=new Map(Object.entries(m).map(([k,v])=>[k,{...v,id:k}]))});saveLocal();render()}).catch(()=>{})}
+    S.ready=true;render();return}
+  const pending=new Set(COLS);
+  COLS.forEach(col=>{
+    const u=db.collection(`ws/${mode}/${col}`).onSnapshot(snap=>{
+      const m=new Map();snap.docs.forEach(d=>m.set(d.id,{...d.data(),id:d.id}));
+      S.data[col]=m;pending.delete(col);if(!pending.size)S.ready=true;scheduleRender();
+    },err=>toast('Mất kết nối dữ liệu ('+(err&&err.code)+'). Tải lại trang để thử lại.'));
+    unsubs.push(u);
+  });
+}
+async function put(col,id,obj){
+  const body={...obj};delete body.id;
+  if(db){
+    try{await db.doc(`ws/${mode}/${col}/${id}`).set(body)}
+    catch(e){toast(e&&e.code==='invalid_argument'?'Bạn chỉ có quyền xem, không lưu được thay đổi.':'Chưa lưu được, thử lại sau giây lát.');throw e}
+  }else{S.data[col].set(id,{...body,id});saveLocal();scheduleRender()}
+}
+async function patch(col,id,part){const cur=get(col,id)||{};return put(col,id,{...cur,...part})}
+async function connect(){
+  try{const c=window.claude;db=(c&&typeof c.use==='function')?await c.use('db'):null}catch(e){db=null}
+  S.dbOk=!!db;subscribe();
+}
+
+/* ---------- derived ---------- */
+function derive(){
+  const appts=all('appointments'),courses=all('courses'),sales=all('sales');
+  const last={},future={},debt={},activeCourse={},visits={},spent={};
+  appts.forEach(a=>{
+    if(a.status==='done'){if(!last[a.customerId]||a.date>last[a.customerId].date)last[a.customerId]=a;visits[a.customerId]=(visits[a.customerId]||0)+1}
+    if((a.status==='booked'||a.status==='confirmed')&&a.date>=TODAY)future[a.customerId]=true;
+  });
+  sales.forEach(s=>{const d=(s.total||0)-(s.paid||0);if(d>0)debt[s.customerId]=(debt[s.customerId]||0)+d;spent[s.customerId]=(spent[s.customerId]||0)+(s.paid||0)});
+  courses.forEach(c=>{if((c.total||0)-(c.used||0)>0)(activeCourse[c.customerId]=activeCourse[c.customerId]||[]).push(c)});
+  return {last,future,debt,activeCourse,visits,spent};
+}
+function contacted(cid,kind){return !!get('contacts',`${cid}_${TODAY}_${kind}`)}
+
+/* ---------- render core ---------- */
+let rq=0;
+function scheduleRender(){if(rq)return;rq=requestAnimationFrame(()=>{rq=0;render();if(S.sheetView)S.sheetView()})}
+function render(){
+  const ae=document.activeElement,aid=ae&&ae.id,sel=ae&&('selectionStart' in ae)?[ae.selectionStart,ae.selectionEnd]:null;
+  const inView=ae&&$('#view').contains(ae);
+  const st=settings();
+  $('#brand').innerHTML=`${esc(st.name)}<small>${T().org} · ${WD[new Date().getDay()]}, ${dm(TODAY)}/${new Date().getFullYear()}</small>`;
+  $('#m-spa').setAttribute('aria-pressed',mode==='spa');$('#m-nk').setAttribute('aria-pressed',mode==='nhakhoa');
+  const nav=TABS.map(([k,l])=>`<button type="button" data-act="tab" data-tab="${k}" ${S.tab===k?'aria-current="page"':''}>${ICONS[k]}<span>${k==='customers'?(mode==='spa'?'Khách':'Bệnh nhân'):l}</span></button>`).join('');
+  $('#tabbar').innerHTML=nav;$('#rail').innerHTML=nav;
+  let html='';
+  if(S.dbOk===false)html+=`<div class="banner">Bản chạy độc lập: dữ liệu được lưu trên trình duyệt của máy này.</div>`;
+  if(!S.ready)html+=`<div class="empty">Đang tải dữ liệu…</div>`;
+  else html+=({today:viewToday,appts:viewAppts,customers:viewCustomers,pos:viewPOS,report:viewReport,hr:viewHR}[S.tab])();
+  $('#view').innerHTML=html;
+  if(S.tab==='pos'&&S.ready)bindPOS();
+  if(inView&&aid){const el=document.getElementById(aid);if(el){el.focus({preventScroll:true});if(sel&&el.setSelectionRange)try{el.setSelectionRange(sel[0],sel[1])}catch(e){}}}
+}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>t.hidden=true,2600)}
+function statusPill(s){return `<span class="pill st-${s}">${STATUS[s]||s}</span>`}
+function custName(id){return (get('customers',id)||{}).name||'(đã xóa)'}
+function xung(c){return (c&&c.xung)||T().xung}
+
+/* ---------- messages ---------- */
+function msg(kind,c,extra){
+  const x=xung(c),fn=firstName(c&&c.name),org=settings().name,X=x.charAt(0).toUpperCase()+x.slice(1);
+  switch(kind){
+    case 'remind':return `${X} ${fn} ơi, ${org} xin nhắc lịch hẹn ${extra.service} lúc ${extra.time} ngày ${dm(extra.date)}. ${X} xác nhận giúp em nhé, em cảm ơn ${x}!`;
+    case 'low':return `${X} ${fn} ơi, ${T().course.toLowerCase()} ${extra.name} của ${x} còn ${extra.rem} ${T().visit}. Em giữ lịch ${T().visit} tiếp theo cho ${x} nhé? ${org} đang có ưu đãi gia hạn cho khách thân ạ.`;
+    case 'nonext':return `${X} ${fn} ơi, đã ${extra.days} ngày ${x} chưa quay lại ${extra.name} (còn ${extra.rem} ${T().visit}). Tuần này ${x} rảnh hôm nào để em xếp lịch ạ?`;
+    case 'recall':return mode==='spa'?`${X} ${fn} ơi, lâu rồi ${org} chưa được gặp ${x}. Tháng này ${org} có ưu đãi cho khách quen, ${x} ghé chăm sóc nhé!`:`${X} ${fn} ơi, đã đến hạn tái khám ${extra.service}. ${X} đặt lịch giúp ${org} để bác sĩ kiểm tra định kỳ nhé!`;
+    case 'bday':return `Chúc mừng sinh nhật ${x} ${fn}! ${org} gửi tặng ${x} ưu đãi 20% cho một dịch vụ bất kỳ trong tháng sinh nhật ạ.`;
+    case 'debt':return `${X} ${fn} ơi, ${org} xin gửi thông tin: ${x} còn ${money(extra.amount)} chưa thanh toán. ${X} tiện chuyển khoản hoặc thanh toán ở lần hẹn tới giúp em nhé!`;
+  }return '';
+}
+function zaloBtns(c,text,kind){
+  return `<a class="btn sm zalo" href="${esc(zaloUrl(c.phone))}" target="_blank" rel="noopener" data-act="zalo" data-msg="${esc(text)}">Nhắn Zalo</a>`+
+   (kind?`<button class="btn sm" type="button" data-act="contact" data-cid="${c.id}" data-kind="${kind}">Xong</button>`:'');
+}
+
+/* ---------- TODAY ---------- */
+function viewToday(){
+  const d=derive(),t=T();
+  const appts=all('appointments'),custs=all('customers');
+  const todays=appts.filter(a=>a.date===TODAY&&a.status!=='cancelled').sort((a,b)=>toMin(a.time)-toMin(b.time));
+  const revToday=all('payments').filter(p=>p.date===TODAY).reduce((s,p)=>s+(p.amount||0),0);
+  const tomorrow=addDays(TODAY,1);
+  const remind=appts.filter(a=>a.date===tomorrow&&a.status==='booked').sort((a,b)=>toMin(a.time)-toMin(b.time));
+  const low=[],nonext=[];
+  all('courses').forEach(c=>{
+    const rem=(c.total||0)-(c.used||0);const cu=get('customers',c.customerId);if(!cu||rem<=0)return;
+    if(rem<=2&&!contacted(cu.id,'low'))low.push({c,cu,rem});
+    const lastD=d.last[cu.id]?d.last[cu.id].date:c.startDate;
+    if(!d.future[cu.id]&&lastD&&daysBetween(lastD,TODAY)>=7&&!contacted(cu.id,'nonext'))nonext.push({c,cu,rem,days:daysBetween(lastD,TODAY)});
+  });
+  const recall=[];
+  custs.forEach(cu=>{
+    const la=d.last[cu.id];if(!la||d.future[cu.id]||d.activeCourse[cu.id])return;
+    const sv=get('services',la.serviceId)||{};const rd=sv.recallDays||(mode==='spa'?30:180);
+    const since=daysBetween(la.date,TODAY);
+    if(since>=rd-3&&!contacted(cu.id,'recall'))recall.push({cu,since,service:sv.name||'định kỳ'});
+  });
+  recall.sort((a,b)=>b.since-a.since);
+  const bday=custs.filter(cu=>{if(!cu.birthday)return false;const b=parseYmd(cu.birthday);for(let i=0;i<=7;i++){const x=parseYmd(addDays(TODAY,i));if(x.getDate()===b.getDate()&&x.getMonth()===b.getMonth())return true}return false}).filter(cu=>!contacted(cu.id,'bday'));
+  const debts=custs.filter(cu=>d.debt[cu.id]>0).map(cu=>({cu,amount:d.debt[cu.id]})).sort((a,b)=>b.amount-a.amount);
+  const taskCount=remind.length+low.length+nonext.length+recall.length+bday.length;
+  const arrivedOrDone=todays.filter(a=>a.status==='done'||a.status==='arrived').length;
+
+  const sec=(title,sub,color,items,rowFn,emptyText)=>`<section class="panel"><div class="panel-h"><span class="dot" style="background:${color}"></span><h2>${title}</h2><span class="count num">${items.length}</span></div>${sub?`<div class="panel-sub" style="padding-top:10px">${sub}</div>`:''}<div class="list">${items.length?items.map(rowFn).join(''):`<div class="empty">${emptyText}</div>`}</div></section>`;
+  const custs0=!custs.length;
+  let h=`<div class="head"><div><div class="eyebrow">Việc cần làm hôm nay</div><h1>${taskCount?`Có ${taskCount} ${t.cust} cần chăm sóc hôm nay`:'Hôm nay không sót ai'}</h1></div></div>`;
+  if(custs0)h+=`<div class="infobox">Chưa có dữ liệu. Vào tab <b>${mode==='spa'?'Khách':'Bệnh nhân'}</b> để thêm ${t.cust} đầu tiên, hoặc mở <b>Cài đặt</b> để thêm dịch vụ và ${t.staff.toLowerCase()}.</div>`;
+  h+=`<div class="tiles">
+    <div class="tile"><span class="v num">${todays.length}</span><span class="l">Lịch hẹn hôm nay</span></div>
+    <div class="tile"><span class="v num">${arrivedOrDone}/${todays.length}</span><span class="l">Đã đến</span></div>
+    <div class="tile"><span class="v num">${money(revToday)}</span><span class="l">Doanh thu hôm nay</span></div>
+    <div class="tile"><span class="v num">${taskCount}</span><span class="l">Việc chăm sóc</span></div></div>`;
+  h+=`<div class="grid2"><div style="display:flex;flex-direction:column;gap:18px">`;
+  h+=sec('Nhắc lịch ngày mai',`Lịch ${dm(tomorrow)} chưa được ${t.cust} xác nhận`,'var(--info)',remind,a=>{const cu=get('customers',a.customerId)||{id:a.customerId};const sv=serviceName(a.serviceId);
+    return `<div class="row"><span class="time">${esc(a.time)}</span><div class="row-main"><b>${esc(cu.name)}</b><span>${esc(sv)} · ${esc(staffOf(a.staffId).name)}</span></div><div class="row-acts">${zaloBtns(cu,msg('remind',cu,{service:sv,time:a.time,date:a.date}))}<button class="btn sm" type="button" data-act="status" data-id="${a.id}" data-s="confirmed">Đã xác nhận</button></div></div>`},'Tất cả lịch ngày mai đã được xác nhận.');
+  h+=sec(`${t.course} chưa hẹn ${t.visit} tiếp`,`Có nguy cơ bỏ dở ${t.course.toLowerCase()}`,'var(--bad)',nonext,x=>`<div class="row"><div class="avatar">${esc(initials(x.cu.name))}</div><div class="row-main"><b>${esc(x.cu.name)}</b><span>${esc(x.c.name)} · còn ${x.rem} ${t.visit} · ${x.days} ngày chưa đến</span></div><div class="row-acts">${zaloBtns(x.cu,msg('nonext',x.cu,{days:x.days,name:x.c.name,rem:x.rem}),'nonext')}<button class="btn sm" type="button" data-act="new-appt" data-cid="${x.cu.id}">Đặt lịch</button></div></div>`,`Không có ${t.cust} nào bỏ ngang ${t.course.toLowerCase()}.`);
+  h+=sec(`Sắp hết ${t.course.toLowerCase()}`,'Cơ hội tư vấn gia hạn','var(--warn)',low,x=>`<div class="row"><div class="avatar">${esc(initials(x.cu.name))}</div><div class="row-main"><b>${esc(x.cu.name)}</b><span>${esc(x.c.name)} · còn ${x.rem}/${x.c.total} ${t.visit}</span></div><div class="row-acts">${zaloBtns(x.cu,msg('low',x.cu,{name:x.c.name,rem:x.rem}),'low')}</div></div>`,`Chưa có ${t.course.toLowerCase()} nào sắp hết.`);
+  h+=`</div><div style="display:flex;flex-direction:column;gap:18px">`;
+  h+=sec('Lịch hôm nay','', 'var(--accent)',todays.slice(0,8),a=>`<div class="row clickable" data-act="appt" data-id="${a.id}"><span class="time">${esc(a.time)}</span><div class="row-main"><b>${esc(custName(a.customerId))}</b><span><i class="staff-dot" style="background:${esc(staffOf(a.staffId).color)}"></i>${esc(serviceName(a.serviceId))}</span></div>${statusPill(a.status)}</div>`,'Hôm nay chưa có lịch hẹn.');
+  h+=sec(t.recall,t.recallSub,'var(--blush-ink)',recall.slice(0,8),x=>`<div class="row"><div class="avatar">${esc(initials(x.cu.name))}</div><div class="row-main"><b>${esc(x.cu.name)}</b><span>Lần cuối ${x.since} ngày trước · ${esc(x.service)}</span></div><div class="row-acts">${zaloBtns(x.cu,msg('recall',x.cu,{service:x.service}),'recall')}</div></div>`,'Không có ai quá hạn.');
+  h+=sec('Sinh nhật 7 ngày tới','','#C07A9A',bday,cu=>`<div class="row"><div class="avatar">${esc(initials(cu.name))}</div><div class="row-main"><b>${esc(cu.name)}</b><span>Sinh nhật ${dm(cu.birthday)}</span></div><div class="row-acts">${zaloBtns(cu,msg('bday',cu),'bday')}</div></div>`,'Không có sinh nhật nào sắp tới.');
+  h+=sec('Còn nợ','','var(--bad)',debts.slice(0,6),x=>`<div class="row"><div class="avatar">${esc(initials(x.cu.name))}</div><div class="row-main"><b>${esc(x.cu.name)}</b><span class="num">Còn nợ ${money(x.amount)}</span></div><div class="row-acts">${zaloBtns(x.cu,msg('debt',x.cu,{amount:x.amount}))}<button class="btn sm" type="button" data-act="pos-debt" data-cid="${x.cu.id}">Thu nợ</button></div></div>`,'Không ai còn nợ.');
+  h+=`</div></div>`;
+  return h;
+}
+
+/* ---------- APPOINTMENTS ---------- */
+function viewAppts(){
+  const t=T(),appts=all('appointments');
+  const start=addDays(S.apptDate,-3);
+  let strip='';for(let i=0;i<10;i++){const d=addDays(start,i),n=appts.filter(a=>a.date===d&&a.status!=='cancelled').length,dd=parseYmd(d);
+    strip+=`<button type="button" class="day ${d===TODAY?'today':''}" data-act="appt-date" data-d="${d}" aria-pressed="${d===S.apptDate}"><span class="wd">${d===TODAY?'Nay':WD[dd.getDay()]}</span><span class="dd">${dd.getDate()}</span><span class="n">${n?n+' lịch':'–'}</span></button>`}
+  const staff=activeStaff();
+  let list=appts.filter(a=>a.date===S.apptDate).sort((a,b)=>toMin(a.time)-toMin(b.time));
+  if(S.apptStaff!=='all')list=list.filter(a=>a.staffId===S.apptStaff);
+  const cnt=s=>list.filter(a=>a.status===s).length;
+  let h=`<div class="head"><div><div class="eyebrow">Lịch hẹn</div><h1>${S.apptDate===TODAY?'Hôm nay':WD[parseYmd(S.apptDate).getDay()]+', '+dm(S.apptDate)}</h1></div>
+   <div class="chips"><button class="chip" type="button" data-act="appt-shift" data-n="-7">‹ Tuần trước</button><button class="chip" type="button" data-act="appt-date" data-d="${TODAY}">Hôm nay</button><button class="chip" type="button" data-act="appt-shift" data-n="7">Tuần sau ›</button></div></div>
+   <div class="daystrip">${strip}</div>
+   <div class="chips"><button class="chip" type="button" data-act="appt-staff" data-id="all" aria-pressed="${S.apptStaff==='all'}">Tất cả ${t.staff.toLowerCase()}</button>${staff.map(s=>`<button class="chip" type="button" data-act="appt-staff" data-id="${s.id}" aria-pressed="${S.apptStaff===s.id}"><i class="staff-dot" style="background:${esc(s.color)}"></i>${esc(s.name)}</button>`).join('')}</div>
+   <section class="panel"><div class="panel-h"><h2>${list.length} lịch hẹn</h2><span class="muted" style="margin-left:auto;font-size:12.5px">${cnt('done')} xong · ${cnt('confirmed')} đã xác nhận · ${cnt('booked')} chờ xác nhận${cnt('noshow')?' · '+cnt('noshow')+' không đến':''}</span></div><div class="list">`;
+  h+=list.length?list.map(a=>{const cu=get('customers',a.customerId)||{};const sf=staffOf(a.staffId);const co=a.courseId&&get('courses',a.courseId);
+    return `<div class="row clickable" data-act="appt" data-id="${a.id}"><span class="time">${esc(a.time)}</span><div class="row-main"><b>${esc(cu.name||'(không rõ)')}</b><span><i class="staff-dot" style="background:${esc(sf.color)}"></i>${esc(sf.name)} · ${esc(serviceName(a.serviceId))}${co?` · ${t.visit} ${Math.min((co.used||0)+(a.status==='done'?0:1),co.total)}/${co.total}`:''}</span></div>${statusPill(a.status)}</div>`}).join(''):`<div class="empty">Chưa có lịch hẹn ngày này. Bấm “Đặt lịch” để thêm.</div>`;
+  h+=`</div></section><button class="btn primary fab" type="button" data-act="new-appt">+ Đặt lịch</button>`;
+  return h;
+}
+function apptSheet(id){
+  const a=get('appointments',id);if(!a){closeSheet();return}
+  const cu=get('customers',a.customerId)||{id:a.customerId},sv=get('services',a.serviceId)||{},sf=staffOf(a.staffId),co=a.courseId&&get('courses',a.courseId),t=T();
+  const acts=[];
+  if(a.status==='booked')acts.push(['confirmed','Đã xác nhận']);
+  if(a.status==='booked'||a.status==='confirmed')acts.push(['arrived','Khách đã đến']);
+  if(a.status!=='done'&&a.status!=='cancelled')acts.push(['done','Hoàn thành']);
+  if(a.status==='booked'||a.status==='confirmed')acts.push(['noshow','Không đến'],['cancelled','Hủy lịch']);
+  openSheet(`<div class="sheet-h"><h2>${esc(a.time)} · ${dm(a.date)}</h2>${statusPill(a.status)}<button class="btn sm ghost" type="button" data-act="close">Đóng</button></div>
+   <dl class="kv"><dt>${t.customer}</dt><dd><a href="#" data-act="cust" data-id="${cu.id}" style="color:var(--accent);font-weight:600">${esc(cu.name)}</a> · <span class="num">${esc(phoneFmt(cu.phone))}</span></dd>
+   <dt>Dịch vụ</dt><dd>${esc(sv.name||'')} · ${money(sv.price)}</dd><dt>${t.staff}</dt><dd><i class="staff-dot" style="background:${esc(sf.color)}"></i>${esc(sf.name)}</dd>
+   ${co?`<dt>${t.course}</dt><dd>${esc(co.name)} · đã dùng ${co.used}/${co.total} ${t.visit}</dd>`:''}${a.note?`<dt>Ghi chú</dt><dd>${esc(a.note)}</dd>`:''}</dl>
+   ${a.status==='done'&&!co?'<div class="infobox">Dịch vụ lẻ đã hoàn thành. Nếu chưa thu tiền, bấm “Thu tiền dịch vụ này”.</div>':''}
+   <div class="btn-grid">${acts.map(([s,l])=>`<button class="btn ${s==='done'?'primary':''} ${s==='cancelled'||s==='noshow'?'danger':''}" type="button" data-act="status" data-id="${a.id}" data-s="${s}">${l}</button>`).join('')}
+   ${zaloBtns(cu,msg('remind',cu,{service:sv.name||'',time:a.time,date:a.date})).replace('btn sm zalo','btn zalo')}
+   ${a.status==='done'&&!co?`<button class="btn" type="button" data-act="pos-appt" data-id="${a.id}">Thu tiền dịch vụ này</button>`:''}</div>`);
+  S.sheetView=()=>{if(get('appointments',id))apptSheet(id)};
+}
+async function setStatus(id,s){
+  const a=get('appointments',id);if(!a)return;
+  const part={status:s};
+  if(s==='done'&&a.status!=='done'){
+    const sv=get('services',a.serviceId)||{};let value=sv.price||0;
+    if(a.courseId){const co=get('courses',a.courseId);if(co){value=Math.round((co.price||0)/(co.total||1));await patch('courses',co.id,{used:Math.min((co.used||0)+1,co.total)})}}
+    part.value=value;part.commission=Math.round(value*(sv.commissionPct||0)/100);part.doneAt=TODAY;
+  }
+  await patch('appointments',id,part);
+  toast(s==='done'?'Đã hoàn thành'+(a.courseId?', tự trừ 1 '+T().visit:''):'Đã cập nhật: '+STATUS[s]);
+}
+function apptForm(pre){
+  pre=pre||{};const t=T();
+  const services=all('services').sort((a,b)=>(a.name||'').localeCompare(b.name||'')),staff=activeStaff();
+  const F={customerId:pre.customerId||'',q:'',adding:false,serviceId:pre.serviceId||'',staffId:staff[0]?staff[0].id:'',date:pre.date||S.apptDate,time:pre.time||'09:00',courseId:'',note:''};
+  if(F.customerId){const ac=(derive().activeCourse[F.customerId]||[])[0];if(ac){F.courseId=ac.id;F.serviceId=ac.serviceId||F.serviceId}}
+  const draw=()=>{
+    const cu=F.customerId&&get('customers',F.customerId);
+    const courses=F.customerId?(derive().activeCourse[F.customerId]||[]):[];
+    const conflict=all('appointments').find(a=>a.staffId===F.staffId&&a.date===F.date&&a.status!=='cancelled'&&a.status!=='noshow'&&Math.abs(toMin(a.time)-toMin(F.time))<((get('services',a.serviceId)||{}).duration||60));
+    openSheet(`<div class="sheet-h"><h2>Đặt lịch hẹn</h2><button class="btn sm ghost" type="button" data-act="close">Đóng</button></div>
+     <form class="form" id="appt-form">
+      <div class="field"><label for="af-q">${t.customer}</label>${custPickerHTML('af',cu,F)}</div>
+      ${courses.length?`<div class="field"><label for="af-course">Dùng ${t.course.toLowerCase()}</label><select class="input" id="af-course"><option value="">Không, dịch vụ lẻ</option>${courses.map(c=>`<option value="${c.id}" ${F.courseId===c.id?'selected':''}>${esc(c.name)} (còn ${c.total-c.used} ${t.visit})</option>`).join('')}</select></div>`:''}
+      <div class="field"><label for="af-sv">Dịch vụ</label><select class="input" id="af-sv"><option value="">Chọn dịch vụ</option>${services.map(s=>`<option value="${s.id}" ${F.serviceId===s.id?'selected':''}>${esc(s.name)} · ${money(s.price)}</option>`).join('')}</select></div>
+      <div class="field"><label for="af-st">${t.staff}</label><select class="input" id="af-st">${staff.map(s=>`<option value="${s.id}" ${F.staffId===s.id?'selected':''}>${esc(s.name)}</option>`).join('')}</select></div>
+      <div class="form-row"><div class="field"><label for="af-date">Ngày</label><input class="input" type="date" id="af-date" value="${F.date}"></div><div class="field"><label for="af-time">Giờ</label><input class="input" type="time" id="af-time" step="900" value="${F.time}"></div></div>
+      ${conflict?`<div class="warnbox">${esc(staffOf(F.staffId).name)} đã có lịch lúc ${esc(conflict.time)} (${esc(custName(conflict.customerId))}). Vẫn có thể đặt nếu bạn chắc chắn.</div>`:''}
+      <div class="field"><label for="af-note">Ghi chú</label><input class="input" id="af-note" value="${esc(F.note)}" placeholder="Ví dụ: da nhạy cảm, muốn phòng riêng"></div>
+      <button class="btn primary" type="submit">Lưu lịch hẹn</button>
+     </form>`,el=>{
+      bindPicker(el,'af',F,draw);
+      const on=(id,k,redraw)=>{const x=el.querySelector('#'+id);if(x)x.addEventListener('change',()=>{F[k]=x.value;if(k==='courseId'&&x.value){const c=get('courses',x.value);if(c&&c.serviceId)F.serviceId=c.serviceId}if(redraw)draw()})};
+      on('af-course','courseId',true);on('af-sv','serviceId',false);on('af-st','staffId',true);on('af-date','date',true);on('af-time','time',true);
+      el.querySelector('#af-note').addEventListener('input',e=>F.note=e.target.value);
+      el.querySelector('#appt-form').addEventListener('submit',async e=>{e.preventDefault();
+        F.serviceId=el.querySelector('#af-sv').value;
+        const cid=await resolvePickerCustomer(F);if(!cid)return toast('Chọn hoặc thêm '+t.cust+' trước.');
+        if(!F.serviceId)return toast('Chọn dịch vụ.');
+        const id=uid();await put('appointments',id,{customerId:cid,serviceId:F.serviceId,staffId:F.staffId,date:F.date,time:F.time,status:'booked',courseId:F.courseId||'',note:F.note,createdAt:TODAY});
+        S.apptDate=F.date;closeSheet();toast('Đã đặt lịch '+F.time+' ngày '+dm(F.date));render();
+      });
+    });
+    S.sheetView=null;
+  };
+  draw();
+}
+
+/* ---------- customer picker (shared) ---------- */
+function custPickerHTML(p,cu,F){
+  if(cu)return `<div class="picked"><div class="avatar" style="width:32px;height:32px">${esc(initials(cu.name))}</div><div class="row-main"><b>${esc(cu.name)}</b><span class="num">${esc(phoneFmt(cu.phone))}</span></div><button class="btn sm ghost" type="button" id="${p}-clear">Đổi</button></div>`;
+  if(F.adding)return `<div class="form-row"><input class="input" id="${p}-nn" placeholder="Họ tên" value="${esc(F.newName||'')}"><input class="input" id="${p}-np" inputmode="tel" placeholder="Số điện thoại" value="${esc(F.newPhone||'')}"></div><button class="btn sm ghost" type="button" id="${p}-cancelnew" style="align-self:flex-start">Chọn ${T().cust} có sẵn</button>`;
+  return `<div class="search">${ICONS.search}<input class="input" id="${p}-q" autocomplete="off" placeholder="Gõ tên hoặc số điện thoại" value="${esc(F.q||'')}"></div><div id="${p}-res"></div>`;
+}
+function pickerResults(q){
+  const n=norm(q).trim();const list=all('customers').filter(c=>!n||norm(c.name).includes(n)||String(c.phone||'').includes(n.replace(/\s/g,''))).slice(0,6);
+  return `<div class="picker-results">${list.map(c=>`<button type="button" data-pick="${c.id}"><span class="avatar" style="width:28px;height:28px;font-size:11px">${esc(initials(c.name))}</span><span><b>${esc(c.name)}</b> <span class="muted num">${esc(phoneFmt(c.phone))}</span></span></button>`).join('')}<button type="button" data-addnew="1" style="color:var(--accent);font-weight:600">+ Thêm ${T().cust} mới${q?' “'+esc(q)+'”':''}</button></div>`;
+}
+function bindPicker(el,p,F,redraw){
+  const q=el.querySelector('#'+p+'-q'),res=el.querySelector('#'+p+'-res');
+  if(q){const show=()=>{res.innerHTML=pickerResults(q.value)};q.addEventListener('input',()=>{F.q=q.value;show()});q.addEventListener('focus',show);
+    res.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.pick){F.customerId=b.dataset.pick;const ac=(derive().activeCourse[F.customerId]||[])[0];if(ac&&'courseId' in F){F.courseId=ac.id;if(ac.serviceId)F.serviceId=ac.serviceId}}else{F.adding=true;if(/^\d/.test(F.q||''))F.newPhone=F.q;else F.newName=F.q||''}redraw()})}
+  const c=el.querySelector('#'+p+'-clear');if(c)c.addEventListener('click',()=>{F.customerId='';F.q='';if('courseId' in F)F.courseId='';redraw()});
+  const nn=el.querySelector('#'+p+'-nn'),np=el.querySelector('#'+p+'-np');if(nn){nn.addEventListener('input',()=>F.newName=nn.value);np.addEventListener('input',()=>F.newPhone=np.value);if(!document.activeElement||document.activeElement===document.body)nn.focus()}
+  const cn=el.querySelector('#'+p+'-cancelnew');if(cn)cn.addEventListener('click',()=>{F.adding=false;redraw()});
+}
+async function resolvePickerCustomer(F){
+  if(F.customerId)return F.customerId;
+  if(F.adding&&(F.newName||'').trim()){const id=uid();await put('customers',id,{name:F.newName.trim(),phone:(F.newPhone||'').replace(/\D/g,''),source:'Vãng lai',createdAt:TODAY,xung:T().xung});F.customerId=id;return id}
+  return '';
+}
+
+/* ---------- CUSTOMERS ---------- */
+function viewCustomers(){
+  const d=derive(),t=T();
+  let list=all('customers');
+  const n=norm(S.custQ).trim();
+  if(n)list=list.filter(c=>norm(c.name).includes(n)||String(c.phone||'').includes(n.replace(/\s/g,'')));
+  const F=S.custF;
+  if(F==='course')list=list.filter(c=>d.activeCourse[c.id]);
+  if(F==='debt')list=list.filter(c=>d.debt[c.id]>0);
+  if(F==='away')list=list.filter(c=>d.last[c.id]&&daysBetween(d.last[c.id].date,TODAY)>30&&!d.future[c.id]);
+  if(F==='new')list=list.filter(c=>c.createdAt&&daysBetween(c.createdAt,TODAY)<=30);
+  list.sort((a,b)=>((d.last[b.id]||{}).date||b.createdAt||'').localeCompare((d.last[a.id]||{}).date||a.createdAt||''));
+  const chip=(k,l)=>`<button class="chip" type="button" data-act="cust-f" data-f="${k}" aria-pressed="${F===k}">${l}</button>`;
+  let h=`<div class="head"><div><div class="eyebrow">${t.customer}</div><h1>${all('customers').length} ${t.cust}</h1><span class="muted" style="font-size:13px">${all('customers').filter(c=>c.createdAt===TODAY).length} ${t.cust} mới hôm nay</span></div><button class="btn primary" type="button" data-act="new-cust">+ Thêm ${t.cust} mới</button></div>
+   <div class="search">${ICONS.search}<input class="input" id="cust-q" autocomplete="off" placeholder="Tìm theo tên hoặc số điện thoại" value="${esc(S.custQ)}"></div>
+   <div class="chips">${chip('all','Tất cả')}${chip('course','Đang có '+t.course.toLowerCase())}${chip('debt','Còn nợ')}${chip('away','Hơn 30 ngày chưa đến')}${chip('new','Mới trong 30 ngày')}</div>
+   <section class="panel"><div class="list">`;
+  h+=list.length?list.map(c=>{const la=d.last[c.id];const tags=[];
+    if(d.activeCourse[c.id])tags.push(`<span class="tag course">${t.course}</span>`);if(d.debt[c.id]>0)tags.push(`<span class="tag debt num">Nợ ${money(d.debt[c.id])}</span>`);if(c.tags)String(c.tags).split(',').filter(Boolean).slice(0,1).forEach(x=>tags.push(`<span class="tag">${esc(x.trim())}</span>`));
+    return `<div class="row clickable" data-act="cust" data-id="${c.id}"><div class="avatar">${esc(initials(c.name))}</div><div class="row-main"><b>${esc(c.name)}</b><span class="num">${esc(phoneFmt(c.phone))} · ${la?'Lần cuối '+dm(la.date):'Chưa đến lần nào'}</span></div><div class="row-acts">${tags.join('')}</div></div>`}).join(''):`<div class="empty">Không tìm thấy ${t.cust} phù hợp.</div>`;
+  return h+`</div></section><button class="btn primary fab" type="button" data-act="new-cust">+ Thêm ${t.cust} mới</button>`;
+}
+function custSheet(id){
+  const c=get('customers',id);if(!c){closeSheet();return}
+  const d=derive(),t=T();
+  const appts=all('appointments').filter(a=>a.customerId===id).sort((a,b)=>(b.date+b.time).localeCompare(a.date+a.time));
+  const courses=all('courses').filter(x=>x.customerId===id);
+  const sales=all('sales').filter(s=>s.customerId===id).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  openSheet(`<div class="sheet-h"><div class="avatar">${esc(initials(c.name))}</div><h2>${esc(c.name)}</h2><button class="btn sm ghost" type="button" data-act="close">Đóng</button></div>
+   <div class="tiles" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div class="tile"><span class="v num" style="font-size:18px">${d.visits[id]||0}</span><span class="l">Lần đến</span></div><div class="tile"><span class="v num" style="font-size:18px">${money(d.spent[id]||0)}</span><span class="l">Đã chi</span></div><div class="tile"><span class="v num" style="font-size:18px;color:${d.debt[id]?'var(--bad)':'inherit'}">${money(d.debt[id]||0)}</span><span class="l">Còn nợ</span></div></div>
+   <dl class="kv"><dt>Điện thoại</dt><dd class="num">${esc(phoneFmt(c.phone))||'—'}</dd><dt>Sinh nhật</dt><dd>${c.birthday?dm(c.birthday)+'/'+c.birthday.slice(0,4):'—'}</dd><dt>Nguồn</dt><dd>${esc(c.source||'—')}</dd>${c.note?`<dt>Ghi chú</dt><dd>${esc(c.note)}</dd>`:''}</dl>
+   <div class="btn-grid"><button class="btn primary" type="button" data-act="new-appt" data-cid="${id}">Đặt lịch</button><button class="btn" type="button" data-act="pos-course" data-cid="${id}">Bán ${t.course.toLowerCase()}</button>${zaloBtns(c,`Chào ${xung(c)} ${firstName(c.name)}, `).replace('btn sm zalo','btn zalo')}<button class="btn" type="button" data-act="edit-cust" data-id="${id}">Sửa thông tin</button>${d.debt[id]?`<button class="btn danger" type="button" data-act="pos-debt" data-cid="${id}">Thu nợ</button>`:''}</div>
+   <section class="panel"><div class="panel-h"><h2>${t.course}</h2><span class="count num">${courses.length}</span></div><div class="list">${courses.length?courses.map(x=>{const pct=Math.round((x.used||0)/(x.total||1)*100);return `<div class="row"><div class="row-main" style="gap:6px"><b>${esc(x.name)}</b><div class="prog"><i style="width:${pct}%"></i></div><span class="num">Đã dùng ${x.used||0}/${x.total} ${t.visit} · ${money(x.price)}</span></div></div>`}).join(''):`<div class="empty">Chưa có ${t.course.toLowerCase()}.</div>`}</div></section>
+   <section class="panel"><div class="panel-h"><h2>Lịch sử hẹn</h2><span class="count num">${appts.length}</span></div><div class="list">${appts.length?appts.slice(0,8).map(a=>`<div class="row clickable" data-act="appt" data-id="${a.id}"><span class="time" style="min-width:56px">${dm(a.date)}</span><div class="row-main"><b style="font-weight:500">${esc(serviceName(a.serviceId))}</b><span>${esc(a.time)} · ${esc(staffOf(a.staffId).name)}</span></div>${statusPill(a.status)}</div>`).join(''):'<div class="empty">Chưa có lịch hẹn.</div>'}</div></section>
+   <section class="panel"><div class="panel-h"><h2>Hóa đơn</h2><span class="count num">${sales.length}</span></div><div class="list">${sales.length?sales.slice(0,8).map(s=>`<div class="row"><span class="time" style="min-width:56px">${dm(s.date)}</span><div class="row-main"><b style="font-weight:500">${esc(s.label)}</b><span class="num">Tổng ${money(s.total)} · đã trả ${money(s.paid)}</span></div>${(s.total-s.paid)>0?`<span class="tag debt num">Nợ ${money(s.total-s.paid)}</span>`:'<span class="pill st-done">Đủ</span>'}</div>`).join(''):'<div class="empty">Chưa có hóa đơn.</div>'}</div></section>`);
+  S.sheetView=()=>{if(get('customers',id))custSheet(id)};
+}
+function custForm(id){
+  const c=id?get('customers',id):{};const t=T();
+  openSheet(`<div class="sheet-h"><h2>${id?'Sửa thông tin':'Thêm '+t.cust+' mới'}</h2><button class="btn sm ghost" type="button" data-act="close">Đóng</button></div>
+   <form class="form" id="cf">
+    <div class="field"><label for="cf-name">Họ tên</label><input class="input" id="cf-name" required value="${esc(c.name||'')}" placeholder="Nguyễn Thị Lan"></div>
+    <div class="form-row"><div class="field"><label for="cf-phone">Số điện thoại</label><input class="input" id="cf-phone" inputmode="tel" value="${esc(c.phone||'')}" placeholder="0901234567"></div>
+    <div class="field"><label for="cf-x">Xưng hô</label><select class="input" id="cf-x">${['chị','anh','cô','chú','bạn','anh/chị'].map(x=>`<option ${xung(c)===x?'selected':''}>${x}</option>`).join('')}</select></div></div>
+    <div class="form-row"><div class="field"><label for="cf-bd">Sinh nhật</label><input class="input" type="date" id="cf-bd" value="${esc(c.birthday||'')}"></div>
+    <div class="field"><label for="cf-src">Nguồn khách</label><select class="input" id="cf-src">${SOURCES.map(s=>`<option ${c.source===s?'selected':''}>${s}</option>`).join('')}</select></div></div>
+    <div class="field"><label for="cf-tags">Nhãn (cách nhau bởi dấu phẩy)</label><input class="input" id="cf-tags" value="${esc(c.tags||'')}" placeholder="VIP, da dầu"></div>
+    <div class="field"><label for="cf-note">${mode==='spa'?'Ghi chú da, dị ứng, sở thích':'Tiền sử bệnh, dị ứng thuốc'}</label><textarea class="input" id="cf-note" rows="3">${esc(c.note||'')}</textarea></div>
+    ${id?`<button class="btn primary" type="submit">Lưu thay đổi</button>`:`<div class="btn-grid"><button class="btn primary" type="submit" value="open">Lưu</button><button class="btn" type="submit" value="next">Lưu &amp; thêm ${t.cust} khác</button></div>`}</form>`,el=>{
+    el.querySelector('#cf').addEventListener('submit',async e=>{e.preventDefault();const v=k=>el.querySelector('#cf-'+k).value.trim();
+      if(!v('name'))return toast('Nhập họ tên.');
+      const phone=v('phone').replace(/\D/g,'');
+      if(phone&&all('customers').some(x=>x.phone===phone&&x.id!==id))return toast('Số điện thoại này đã có trong danh sách.');
+      const nid=id||uid();
+      await put('customers',nid,{...c,name:v('name'),phone,xung:v('x'),birthday:v('bd'),source:v('src'),tags:v('tags'),note:v('note'),createdAt:c.createdAt||TODAY});
+      toast(id?'Đã lưu':'Đã thêm '+v('name'));if(!id&&e.submitter&&e.submitter.value==='next')custForm();else custSheet(nid);
+    });el.querySelector('#cf-name').focus()});
+  S.sheetView=null;
+}
+
+/* ---------- POS ---------- */
+function viewPOS(){
+  const P=S.pos,t=T(),cu=P.customerId&&get('customers',P.customerId);
+  const services=all('services').sort((a,b)=>(a.name||'').localeCompare(b.name||'')),pkgs=all('packages'),staff=activeStaff();
+  const openSales=P.customerId?all('sales').filter(s=>s.customerId===P.customerId&&(s.total-s.paid)>0):[];
+  let total=0,label='';
+  if(P.kind==='service'){const s=get('services',P.serviceId);total=P.amount!==''?Number(P.amount):(s?s.price:0);label=s?s.name:''}
+  if(P.kind==='course'){const k=get('packages',P.packageId);total=P.amount!==''?Number(P.amount):(k?k.price:0);label=k?k.name:''}
+  if(P.kind==='debt'){const s=get('sales',P.saleId);total=s?(s.total-s.paid):0;label=s?s.label:''}
+  const paid=P.paid!==''?Number(P.paid):total;const owe=Math.max(0,total-paid);
+  const segB=(k,l)=>`<button type="button" data-act="pos-kind" data-k="${k}" aria-pressed="${P.kind===k}">${l}</button>`;
+  let h=`<div class="head"><div><div class="eyebrow">Thu tiền</div><h1>Tạo hóa đơn</h1></div></div>
+  <div class="grid2"><section class="panel" style="padding:14px"><form class="form" id="pos-form">
+   <div class="seg">${segB('service','Dịch vụ lẻ')}${segB('course','Bán '+t.course.toLowerCase())}${segB('debt','Thu nợ')}</div>
+   <div class="field"><label for="pos-q">${t.customer}</label><div id="pos-picker">${custPickerHTML('pos',cu,P)}</div></div>`;
+  if(P.kind==='service')h+=`<div class="field"><label for="pos-sv">Dịch vụ</label><select class="input" id="pos-sv"><option value="">Chọn dịch vụ</option>${services.map(s=>`<option value="${s.id}" ${P.serviceId===s.id?'selected':''}>${esc(s.name)} · ${money(s.price)}</option>`).join('')}</select></div>
+     <div class="field"><label for="pos-st">${t.staff} thực hiện</label><select class="input" id="pos-st"><option value="">—</option>${staff.map(s=>`<option value="${s.id}" ${P.staffId===s.id?'selected':''}>${esc(s.name)}</option>`).join('')}</select></div>`;
+  if(P.kind==='course')h+=`<div class="field"><label for="pos-pk">Gói ${t.course.toLowerCase()}</label><select class="input" id="pos-pk"><option value="">Chọn gói</option>${pkgs.map(k=>`<option value="${k.id}" ${P.packageId===k.id?'selected':''}>${esc(k.name)} · ${k.sessions} ${t.visit} · ${money(k.price)}</option>`).join('')}</select></div>`;
+  if(P.kind==='debt')h+=`<div class="field"><label for="pos-sale">Hóa đơn còn nợ</label>${!P.customerId?`<div class="infobox">Chọn ${t.cust} để xem khoản nợ.</div>`:openSales.length?`<select class="input" id="pos-sale"><option value="">Chọn hóa đơn</option>${openSales.map(s=>`<option value="${s.id}" ${P.saleId===s.id?'selected':''}>${dm(s.date)} · ${esc(s.label)} · nợ ${money(s.total-s.paid)}</option>`).join('')}</select>`:`<div class="infobox">${t.customer} này không còn nợ.</div>`}</div>`;
+  if(P.kind!=='debt')h+=`<div class="field"><label for="pos-amount">Giá (có thể sửa khi giảm giá)</label><input class="input num" id="pos-amount" inputmode="numeric" value="${P.amount!==''?esc(P.amount):total||''}"></div>`;
+  h+=`<div class="field"><label for="pos-paid">Khách trả lần này</label><input class="input num" id="pos-paid" inputmode="numeric" value="${P.paid!==''?esc(P.paid):total||''}"></div>
+   <div class="chips">${Object.entries(METHODS).map(([k,l])=>`<button class="chip" type="button" data-act="pos-method" data-m="${k}" aria-pressed="${P.method===k}">${l}</button>`).join('')}</div>
+   <div class="infobox"><div class="total"><span>Tổng</span><b>${money(total)}</b></div><div class="total" style="margin-top:4px"><span>Khách trả</span><span class="num">${money(paid)}</span></div>${owe>0?`<div class="total" style="margin-top:4px;color:var(--bad)"><span>Ghi nợ</span><span class="num">${money(owe)}</span></div>`:''}</div>
+   <button class="btn primary" type="submit" ${!total?'disabled':''}>Thu ${money(paid)}${label?' · '+esc(label):''}</button></form></section>`;
+  const todayPays=all('payments').filter(p=>p.date===TODAY).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  const sumBy=m=>todayPays.filter(p=>p.method===m).reduce((s,p)=>s+p.amount,0);
+  h+=`<section class="panel"><div class="panel-h"><h2>Đã thu hôm nay</h2><span class="count num">${money(todayPays.reduce((s,p)=>s+p.amount,0))}</span></div><div class="panel-sub" style="padding-top:10px">${Object.entries(METHODS).map(([k,l])=>`${l} ${money(sumBy(k))}`).join(' · ')}</div><div class="list">${todayPays.length?todayPays.map(p=>`<div class="row"><div class="row-main"><b>${esc(custName(p.customerId))}</b><span>${esc(p.label||'')} · ${METHODS[p.method]||''}</span></div><span class="num" style="font-weight:700">${money(p.amount)}</span></div>`).join(''):'<div class="empty">Chưa thu khoản nào hôm nay.</div>'}</div></section></div>`;
+  return h;
+}
+function bindPOS(){
+  const el=$('#view');if(!el.querySelector('#pos-form'))return;const P=S.pos;
+  bindPicker(el,'pos',P,()=>{P.saleId='';render()});
+  const on=(id,k,ev)=>{const x=el.querySelector('#'+id);if(x)x.addEventListener(ev||'change',()=>{P[k]=ev==='input'?x.value.replace(/\D/g,''):x.value;if(k==='serviceId'||k==='packageId'){P.amount='';P.paid=''}if(k==='amount')P.paid='';rerenderPOS()})};
+  on('pos-sv','serviceId');on('pos-pk','packageId');on('pos-sale','saleId');on('pos-st','staffId');on('pos-amount','amount','input');on('pos-paid','paid','input');
+  el.querySelector('#pos-form').addEventListener('submit',submitPOS);
+}
+function rerenderPOS(){render()}
+async function submitPOS(e){
+  e.preventDefault();const P=S.pos,t=T();
+  const cid=await resolvePickerCustomer(P);if(!cid)return toast('Chọn hoặc thêm '+t.cust+' trước.');
+  const now=Date.now();
+  if(P.kind==='debt'){
+    const s=get('sales',P.saleId);if(!s)return toast('Chọn hóa đơn cần thu nợ.');
+    const owe=s.total-s.paid;const amt=Math.min(owe,P.paid!==''?Number(P.paid):owe);if(!amt)return toast('Nhập số tiền.');
+    await patch('sales',s.id,{paid:s.paid+amt});
+    await put('payments',uid(),{customerId:cid,saleId:s.id,amount:amt,method:P.method,date:TODAY,label:'Thu nợ: '+s.label,createdAt:now});
+    toast('Đã thu nợ '+money(amt));
+  }else{
+    let total,label,courseId='';
+    if(P.kind==='service'){const s=get('services',P.serviceId);if(!s)return toast('Chọn dịch vụ.');total=P.amount!==''?Number(P.amount):s.price;label=s.name}
+    else{const k=get('packages',P.packageId);if(!k)return toast('Chọn gói '+t.course.toLowerCase()+'.');total=P.amount!==''?Number(P.amount):k.price;label=k.name;
+      courseId=uid();await put('courses',courseId,{customerId:cid,packageId:k.id,serviceId:k.serviceId||'',name:k.name,total:k.sessions,used:0,price:total,startDate:TODAY})}
+    const paid=Math.min(total,P.paid!==''?Number(P.paid):total);
+    const saleId=uid();await put('sales',saleId,{customerId:cid,date:TODAY,label,total,paid,kind:P.kind,courseId,appointmentId:P.appointmentId||'',staffId:P.staffId||'',createdAt:now});
+    if(paid>0)await put('payments',uid(),{customerId:cid,saleId,amount:paid,method:P.method,date:TODAY,label,createdAt:now});
+    toast('Đã thu '+money(paid)+(total>paid?' · ghi nợ '+money(total-paid):''));
+  }
+  S.pos={kind:P.kind,customerId:'',q:'',serviceId:'',packageId:'',saleId:'',amount:'',paid:'',method:'cash',staffId:'',note:'',newName:'',newPhone:'',adding:false};
+  rerenderPOS();
+}
+
+/* ---------- REPORT ---------- */
+function viewReport(){
+  const t=T(),P=S.period;
+  const from=P==='today'?TODAY:P==='week'?addDays(TODAY,-6):addDays(TODAY,-29);
+  const inR=d=>d&&d>=from&&d<=TODAY;
+  const pays=all('payments').filter(p=>inR(p.date));const rev=pays.reduce((s,p)=>s+p.amount,0);
+  const appts=all('appointments').filter(a=>inR(a.date));const done=appts.filter(a=>a.status==='done'),noshow=appts.filter(a=>a.status==='noshow');
+  const newC=all('customers').filter(c=>inR(c.createdAt)).length;
+  const nsRate=(done.length+noshow.length)?Math.round(noshow.length/(done.length+noshow.length)*100):0;
+  const debtTotal=all('sales').reduce((s,x)=>s+Math.max(0,x.total-x.paid),0);
+  const days=[];for(let i=6;i>=0;i--){const d=addDays(TODAY,-i);days.push({d,v:all('payments').filter(p=>p.date===d).reduce((s,p)=>s+p.amount,0)})}
+  const max=Math.max(1,...days.map(x=>x.v));
+  const short=v=>v>=1e6?(Math.round(v/1e5)/10).toString().replace('.',',')+'tr':v>=1e3?Math.round(v/1e3)+'k':String(v);
+  const bySvc={};done.forEach(a=>{bySvc[a.serviceId]=(bySvc[a.serviceId]||0)+1});
+  const svcRows=Object.entries(bySvc).sort((a,b)=>b[1]-a[1]).slice(0,6);const svcMax=Math.max(1,...svcRows.map(x=>x[1]));
+  const comm={};done.forEach(a=>{const k=a.staffId||'-';comm[k]=comm[k]||{n:0,v:0,c:0};comm[k].n++;comm[k].v+=a.value||0;comm[k].c+=a.commission||0});
+  const commRows=Object.entries(comm).sort((a,b)=>b[1].c-a[1].c);const commMax=Math.max(1,...commRows.map(x=>x[1].c));
+  const byM={};pays.forEach(p=>byM[p.method]=(byM[p.method]||0)+p.amount);
+  const chip=(k,l)=>`<button class="chip" type="button" data-act="period" data-p="${k}" aria-pressed="${P===k}">${l}</button>`;
+  return `<div class="head"><div><div class="eyebrow">Báo cáo</div><h1>${P==='today'?'Hôm nay':P==='week'?'7 ngày qua':'30 ngày qua'}</h1></div><div class="chips">${chip('today','Hôm nay')}${chip('week','7 ngày')}${chip('month','30 ngày')}</div></div>
+  <div class="tiles"><div class="tile"><span class="v num">${money(rev)}</span><span class="l">Doanh thu</span></div><div class="tile"><span class="v num">${done.length}</span><span class="l">Lượt phục vụ xong</span></div><div class="tile"><span class="v num">${newC}</span><span class="l">${t.customer} mới</span></div><div class="tile"><span class="v num" style="color:${nsRate>15?'var(--bad)':'inherit'}">${nsRate}%</span><span class="l">Tỷ lệ không đến</span></div></div>
+  <div class="grid2"><section class="panel"><div class="panel-h"><h2>Doanh thu 7 ngày</h2><span class="count num">${money(days.reduce((s,x)=>s+x.v,0))}</span></div><div class="bars">${days.map(x=>`<div class="bar ${x.d===TODAY?'today':''}"><em>${x.v?short(x.v):''}</em><i style="height:${Math.round(x.v/max*100)}%"></i><span>${x.d===TODAY?'Nay':WD[parseYmd(x.d).getDay()]}</span></div>`).join('')}</div><div class="panel-sub" style="padding-top:12px">${Object.entries(METHODS).map(([k,l])=>`${l}: ${money(byM[k]||0)}`).join(' · ')} · Tổng công nợ: <b style="color:var(--bad)">${money(debtTotal)}</b></div></section>
+  <section class="panel"><div class="panel-h"><h2>Hoa hồng ${t.staff.toLowerCase()}</h2></div><div>${commRows.length?commRows.map(([k,v])=>`<div class="hbar"><span class="name"><i class="staff-dot" style="background:${esc(staffOf(k).color)}"></i>${esc(staffOf(k).name)} <span class="muted num">· ${v.n}</span></span><span class="track"><i style="width:${Math.round(v.c/commMax*100)}%"></i></span><span class="val">${money(v.c)}</span></div>`).join(''):'<div class="empty">Chưa có lượt phục vụ hoàn thành trong kỳ.</div>'}</div></section></div>
+  <section class="panel"><div class="panel-h"><h2>Dịch vụ làm nhiều nhất</h2></div><div>${svcRows.length?svcRows.map(([k,n])=>`<div class="hbar"><span class="name">${esc(serviceName(k))}</span><span class="track"><i style="width:${Math.round(n/svcMax*100)}%"></i></span><span class="val">${n} lượt</span></div>`).join(''):'<div class="empty">Chưa có dữ liệu trong kỳ.</div>'}</div></section>`;
+}
+
+/* ---------- HR (NHÂN SỰ) ---------- */
+const ATT={present:['Có mặt','C','var(--ok)','st-done'],late:['Đi muộn','M','var(--warn)','st-arrived'],leave:['Nghỉ phép','P','var(--info)','st-confirmed'],absent:['Nghỉ không phép','K','var(--bad)','st-noshow']};
+const PALETTE=['#1E7A68','#B0476A','#3563B8','#A8690F','#6B4FB0','#2F8F5B','#C0562F','#4A7A9E'];
+const byName=(a,b)=>(a.name||'').localeCompare(b.name||'');
+function activeStaff(){return all('staff').filter(s=>s.active!==false).sort(byName)}
+const monthKey=d=>d.slice(0,7);
+function monthLabel(mk){const p=mk.split('-');return 'Tháng '+Number(p[1])+'/'+p[0]}
+function prevMonth(mk){const p=mk.split('-').map(Number);const d=new Date(p[0],p[1]-2,1);return d.getFullYear()+'-'+pad(d.getMonth()+1)}
+function daysInMonth(mk){const p=mk.split('-').map(Number);return new Date(p[0],p[1],0).getDate()}
+function attDoc(sid,mk){return get('attendance',`${sid}_${mk}`)||{staffId:sid,month:mk,days:{}}}
+function attDay(sid,date){return (attDoc(sid,monthKey(date)).days||{})[date.slice(8)]}
+async function setAtt(sid,date,part){
+  const mk=monthKey(date),doc=attDoc(sid,mk),dd=date.slice(8);
+  const days={...(doc.days||{})};const cur={...(days[dd]||{}),...part};
+  if(cur.s===null){delete days[dd]}else days[dd]=cur;
+  await put('attendance',`${sid}_${mk}`,{staffId:sid,month:mk,days});
+}
+function nowHM(){const d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes())}
+function monthStats(sid,mk){
+  const days=attDoc(sid,mk).days||{};const c={present:0,late:0,leave:0,absent:0};
+  Object.values(days).forEach(x=>{if(x&&c[x.s]!==undefined)c[x.s]++});
+  const done=all('appointments').filter(a=>a.staffId===sid&&a.status==='done'&&a.date&&a.date.startsWith(mk));
+  const adv=all('advances').filter(a=>a.staffId===sid&&a.date&&a.date.startsWith(mk));
+  return {...c,cong:c.present+c.late+c.leave,served:done.length,sales:done.reduce((s,a)=>s+(a.value||0),0),commission:done.reduce((s,a)=>s+(a.commission||0),0),adv:adv.reduce((s,a)=>s+(a.amount||0),0),advList:adv};
+}
+function payroll(s,mk){
+  const st=settings(),std=st.workDays||26,pen=st.latePenalty!=null?st.latePenalty:30000;
+  const m=monthStats(s.id,mk);
+  const byDay=Math.round((s.baseSalary||0)*Math.min(m.cong,std)/std);
+  const late=m.late*pen;
+  return {...m,std,pen,base:s.baseSalary||0,byDay,latePen:late,net:byDay+m.commission-late-m.adv};
+}
+function staffAvatar(s,size){size=size||38;return `<div class="avatar" style="width:${size}px;height:${size}px;background:${esc(s.color||'#999')};color:#fff">${esc(initials(s.name))}</div>`}
+function attPill(a){if(!a||!a.s)return '<span class="pill st-booked">Chưa chấm công</span>';const x=ATT[a.s];return `<span class="pill ${x[3]}">${x[0]}${a.in?' · '+esc(a.in):''}${a.out?'–'+esc(a.out):''}</span>`}
+
+function viewHR(){
+  const t=T(),V=S.hr.view;
+  const seg=(k,l)=>`<button type="button" data-act="hr-view" data-v="${k}" aria-pressed="${V===k}">${l}</button>`;
+  let h=`<div class="head"><div><div class="eyebrow">Nhân sự</div><h1>${V==='overview'?'Đội ngũ':V==='att'?'Chấm công':'Bảng lương'}</h1></div><button class="btn primary" type="button" data-act="new-staff">+ Thêm nhân viên</button></div>
+   <div class="seg">${seg('overview','Nhân viên')}${seg('att','Chấm công')}${seg('pay','Bảng lương')}</div>`;
+  if(V==='overview')h+=hrOverview();else if(V==='att')h+=hrAttendance();else h+=hrPayroll();
+  return h;
+}
+function hrOverview(){
+  const t=T(),mk=monthKey(TODAY),staff=activeStaff(),off=all('staff').filter(s=>s.active===false);
+  const here=staff.filter(s=>{const a=attDay(s.id,TODAY);return a&&(a.s==='present'||a.s==='late')}).length;
+  const rows=staff.map(s=>({s,p:payroll(s,mk),a:attDay(s.id,TODAY)}));
+  const comm=rows.reduce((x,r)=>x+r.p.commission,0),fund=rows.reduce((x,r)=>x+r.p.net+r.p.adv,0);
+  let h=`<div class="tiles"><div class="tile"><span class="v num">${staff.length}</span><span class="l">Nhân viên đang làm</span></div>
+   <div class="tile"><span class="v num">${here}/${staff.length}</span><span class="l">Có mặt hôm nay</span></div>
+   <div class="tile"><span class="v num">${money(comm)}</span><span class="l">Hoa hồng ${monthLabel(mk).toLowerCase()}</span></div>
+   <div class="tile"><span class="v num">${money(fund)}</span><span class="l">Quỹ lương tạm tính</span></div></div>
+   <section class="panel"><div class="panel-h"><h2>${t.staff} và nhân viên</h2><span class="count num">${staff.length}</span></div><div class="list">`;
+  h+=rows.length?rows.map(({s,p,a})=>`<div class="row clickable" data-act="staff" data-id="${s.id}">${staffAvatar(s)}<div class="row-main"><b>${esc(s.name)}</b><span>${esc(s.role||'')}${s.phone?' · <span class="num">'+esc(phoneFmt(s.phone))+'</span>':''}</span></div><div class="row-acts">${attPill(a)}<span class="tag course num">${p.served} lượt · ${money(p.commission)}</span></div></div>`).join(''):'<div class="empty">Chưa có nhân viên. Bấm “Thêm nhân viên”.</div>';
+  h+=`</div></section>`;
+  if(off.length)h+=`<section class="panel"><div class="panel-h"><h2>Đã nghỉ việc</h2><span class="count num">${off.length}</span></div><div class="list">${off.map(s=>`<div class="row clickable" data-act="staff" data-id="${s.id}">${staffAvatar(s,32)}<div class="row-main"><b style="font-weight:500">${esc(s.name)}</b><span>${esc(s.role||'')}</span></div></div>`).join('')}</div></section>`;
+  return h+`<button class="btn primary fab" type="button" data-act="new-staff">+ Thêm nhân viên</button>`;
+}
+function hrAttendance(){
+  const D=S.hr.date,staff=activeStaff(),isToday=D===TODAY;
+  const cnt=k=>staff.filter(s=>{const a=attDay(s.id,D);return a&&a.s===k}).length;
+  let h=`<div class="head"><div><h2 style="font-size:18px">${isToday?'Hôm nay, ':''}${WD[parseYmd(D).getDay()]} ${dm(D)}</h2><span class="muted" style="font-size:13px">${cnt('present')} có mặt · ${cnt('late')} đi muộn · ${cnt('leave')} nghỉ phép · ${cnt('absent')} nghỉ không phép</span></div>
+   <div class="chips"><button class="chip" type="button" data-act="hr-shift" data-n="-1">‹ Hôm trước</button><button class="chip" type="button" data-act="hr-date" data-d="${TODAY}">Hôm nay</button><button class="chip" type="button" data-act="hr-shift" data-n="1" ${D>=TODAY?'disabled':''}>Hôm sau ›</button></div></div>
+   <section class="panel"><div class="panel-h"><h2>Chấm công</h2><button class="btn sm" type="button" data-act="att-all" style="margin-left:auto">Chấm tất cả có mặt</button></div><div class="list">`;
+  h+=staff.length?staff.map(s=>{const a=attDay(s.id,D)||{};
+    return `<div class="row">${staffAvatar(s,34)}<div class="row-main"><b>${esc(s.name)}</b><span class="num">${a.in?'Vào '+esc(a.in):'Chưa vào ca'}${a.out?' · Ra '+esc(a.out):''}</span></div>
+     <div class="row-acts">${Object.entries(ATT).map(([k,v])=>`<button class="chip" type="button" data-act="att" data-sid="${s.id}" data-s="${k}" aria-pressed="${a.s===k}" style="padding:5px 10px;font-size:12.5px">${v[0]}</button>`).join('')}
+     <button class="btn sm" type="button" data-act="att-in" data-sid="${s.id}">${a.in?'Sửa giờ vào':'Vào ca'}</button><button class="btn sm" type="button" data-act="att-out" data-sid="${s.id}" ${!a.in?'disabled':''}>Ra ca</button></div></div>`}).join(''):'<div class="empty">Chưa có nhân viên.</div>';
+  h+=`</div></section>`;
+  const mk=monthKey(D),n=monthKey(TODAY)===mk?Number(TODAY.slice(8)):daysInMonth(mk);
+  let grid=`<table class="attgrid"><thead><tr><th class="sticky">Nhân viên</th>`;
+  for(let i=1;i<=n;i++){const d=mk+'-'+pad(i);grid+=`<th class="${d===D?'sel':''}"><button type="button" data-act="hr-date" data-d="${d}">${i}<small>${WD[parseYmd(d).getDay()]}</small></button></th>`}
+  grid+=`<th>Công</th></tr></thead><tbody>`;
+  staff.forEach(s=>{const days=attDoc(s.id,mk).days||{};let c=0;grid+=`<tr><th class="sticky">${esc(s.name)}</th>`;
+    for(let i=1;i<=n;i++){const x=days[pad(i)];const v=x&&ATT[x.s];if(x&&(x.s==='present'||x.s==='late'||x.s==='leave'))c++;grid+=`<td>${v?`<span style="background:${v[2]}">${v[1]}</span>`:'<i>·</i>'}</td>`}
+    grid+=`<td class="num"><b>${c}</b></td></tr>`});
+  grid+=`</tbody></table>`;
+  h+=`<section class="panel"><div class="panel-h"><h2>Bảng công ${monthLabel(mk).toLowerCase()}</h2></div><div style="overflow-x:auto">${grid}</div><div class="panel-sub" style="padding-top:10px">${Object.values(ATT).map(v=>`<span class="attkey" style="background:${v[2]}">${v[1]}</span> ${v[0]}`).join(' &nbsp; ')} · Bấm vào ngày để chấm công ngày đó.</div></section>`;
+  return h;
+}
+function hrPayroll(){
+  const mk=S.hr.month,cur=monthKey(TODAY),prev=prevMonth(cur),st=settings();
+  const rows=activeStaff().map(s=>({s,p:payroll(s,mk)}));
+  const sum=k=>rows.reduce((x,r)=>x+r.p[k],0);
+  const chip=(k,l)=>`<button class="chip" type="button" data-act="hr-month" data-m="${k}" aria-pressed="${mk===k}">${l}</button>`;
+  let h=`<div class="head"><div><h2 style="font-size:18px">${monthLabel(mk)}</h2><span class="muted" style="font-size:13px">Công chuẩn ${st.workDays||26} ngày · phạt đi muộn ${money(st.latePenalty!=null?st.latePenalty:30000)}/lần · đổi trong Cài đặt</span></div><div class="chips">${chip(cur,'Tháng này')}${chip(prev,'Tháng trước')}</div></div>
+  <section class="panel"><div style="overflow-x:auto"><table class="paytable"><thead><tr><th>Nhân viên</th><th>Lương cơ bản</th><th>Công</th><th>Lương theo công</th><th>Hoa hồng</th><th>Phạt muộn</th><th>Tạm ứng</th><th>Thực lĩnh</th></tr></thead><tbody>
+  ${rows.map(({s,p})=>`<tr data-act="staff" data-id="${s.id}"><td><i class="staff-dot" style="background:${esc(s.color)}"></i>${esc(s.name)}</td><td>${money(p.base)}</td><td>${p.cong}/${p.std}${p.late?` <span class="muted">(${p.late} muộn)</span>`:''}</td><td>${money(p.byDay)}</td><td>${money(p.commission)} <span class="muted">· ${p.served} lượt</span></td><td>${p.latePen?'−'+money(p.latePen):'—'}</td><td>${p.adv?'−'+money(p.adv):'—'}</td><td><b>${money(p.net)}</b></td></tr>`).join('')}
+  </tbody><tfoot><tr><td>Tổng</td><td>${money(sum('base'))}</td><td></td><td>${money(sum('byDay'))}</td><td>${money(sum('commission'))}</td><td>${sum('latePen')?'−'+money(sum('latePen')):'—'}</td><td>${sum('adv')?'−'+money(sum('adv')):'—'}</td><td><b>${money(sum('net'))}</b></td></tr></tfoot></table></div>
+  <div class="panel-sub" style="padding-top:12px">Thực lĩnh = lương theo công + hoa hồng − phạt đi muộn − tạm ứng. Nghỉ phép vẫn được tính công, nghỉ không phép thì không. ${mk===cur?'Tháng này chưa kết thúc nên số liệu là tạm tính.':''}</div>
+  <div style="padding:0 14px 14px"><button class="btn" type="button" data-act="copy-pay" style="white-space:normal;text-align:center">Chép bảng lương (dán vào Excel hoặc Zalo)</button></div></section>`;
+  return h;
+}
+function staffSheet(id){
+  const s=get('staff',id);if(!s){closeSheet();return}
+  const mk=monthKey(TODAY),p=payroll(s,mk),t=T();
+  openSheet(`<div class="sheet-h">${staffAvatar(s)}<h2>${esc(s.name)}</h2>${s.active===false?'<span class="pill st-cancelled">Đã nghỉ</span>':''}<button class="btn sm ghost" type="button" data-act="close">Đóng</button></div>
+   <div class="tiles" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div class="tile"><span class="v num" style="font-size:18px">${p.cong}/${p.std}</span><span class="l">Công tháng này</span></div><div class="tile"><span class="v num" style="font-size:18px">${p.served}</span><span class="l">Lượt phục vụ</span></div><div class="tile"><span class="v num" style="font-size:18px">${money(p.commission)}</span><span class="l">Hoa hồng</span></div></div>
+   <dl class="kv"><dt>Vai trò</dt><dd>${esc(s.role||'—')}</dd><dt>Điện thoại</dt><dd class="num">${esc(phoneFmt(s.phone))||'—'}</dd><dt>Ngày vào làm</dt><dd>${s.startDate?dm(s.startDate)+'/'+s.startDate.slice(0,4):'—'}</dd><dt>Lương cơ bản</dt><dd class="num">${money(s.baseSalary)}</dd><dt>Doanh số tháng</dt><dd class="num">${money(p.sales)}</dd><dt>Thực lĩnh tạm tính</dt><dd class="num"><b>${money(p.net)}</b></dd></dl>
+   <div class="btn-grid"><button class="btn primary" type="button" data-act="edit-staff" data-id="${id}">Sửa hồ sơ</button>${s.phone?`<a class="btn zalo" href="${esc(zaloUrl(s.phone))}" target="_blank" rel="noopener" data-act="zalo">Nhắn Zalo</a>`:''}<button class="btn ${s.active===false?'':'danger'}" type="button" data-act="staff-toggle" data-id="${id}">${s.active===false?'Cho đi làm lại':'Đánh dấu nghỉ việc'}</button></div>
+   <section class="panel"><div class="panel-h"><h2>Tạm ứng ${monthLabel(mk).toLowerCase()}</h2><span class="count num">${money(p.adv)}</span></div><div class="list">${p.advList.length?p.advList.sort((a,b)=>b.date.localeCompare(a.date)).map(a=>`<div class="row"><span class="time" style="min-width:52px">${dm(a.date)}</span><div class="row-main"><b style="font-weight:500">${esc(a.note||'Tạm ứng')}</b></div><span class="num" style="font-weight:700">${money(a.amount)}</span></div>`).join(''):'<div class="empty">Chưa tạm ứng tháng này.</div>'}</div>
+   <form class="form" id="adv-f" style="padding:12px 14px;border-top:1px solid var(--line)"><div class="form-row"><input class="input num" id="adv-a" inputmode="numeric" placeholder="Số tiền (đ)" required><input class="input" id="adv-n" placeholder="Ghi chú"></div><button class="btn" type="submit">+ Ghi tạm ứng</button></form></section>`,el=>{
+    el.querySelector('#adv-f').addEventListener('submit',async e=>{e.preventDefault();const amt=Number(el.querySelector('#adv-a').value.replace(/\D/g,''));if(!amt)return toast('Nhập số tiền tạm ứng.');
+      await put('advances',uid(),{staffId:id,amount:amt,note:el.querySelector('#adv-n').value.trim(),date:TODAY});toast('Đã ghi tạm ứng '+money(amt))});
+  });
+  S.sheetView=()=>{const ae=document.activeElement;if(!(ae&&$('#sheet').contains(ae)&&ae.tagName==='INPUT'))staffSheet(id)};
+}
+function staffForm(id){
+  const s=id?get('staff',id):{color:PALETTE[all('staff').length%PALETTE.length],startDate:TODAY};
+  openSheet(`<div class="sheet-h"><h2>${id?'Sửa hồ sơ':'Thêm nhân viên'}</h2><button class="btn sm ghost" type="button" data-act="close">Đóng</button></div>
+   <form class="form" id="sff">
+    <div class="field"><label for="sff-n">Họ tên</label><input class="input" id="sff-n" required value="${esc(s.name||'')}" placeholder="Nguyễn Thu Hoa"></div>
+    <div class="form-row"><div class="field"><label for="sff-r">Vai trò</label><input class="input" id="sff-r" value="${esc(s.role||'')}" placeholder="${mode==='spa'?'Kỹ thuật viên da':'Bác sĩ chỉnh nha'}"></div><div class="field"><label for="sff-p">Điện thoại</label><input class="input" id="sff-p" inputmode="tel" value="${esc(s.phone||'')}"></div></div>
+    <div class="form-row"><div class="field"><label for="sff-d">Ngày vào làm</label><input class="input" type="date" id="sff-d" value="${esc(s.startDate||'')}"></div><div class="field"><label for="sff-s">Lương cơ bản/tháng</label><input class="input num" id="sff-s" inputmode="numeric" value="${s.baseSalary||''}" placeholder="6000000"></div></div>
+    <div class="field"><label>Màu trên lịch hẹn</label><div class="chips" id="sff-c">${PALETTE.map(c=>`<button type="button" class="chip" data-c="${c}" aria-pressed="${s.color===c}" style="width:34px;height:34px;padding:0;background:${c};border:3px solid ${s.color===c?'var(--ink)':'transparent'}" aria-label="Màu ${c}"></button>`).join('')}</div></div>
+    <button class="btn primary" type="submit">${id?'Lưu thay đổi':'Thêm nhân viên'}</button></form>`,el=>{
+    let color=s.color;
+    el.querySelector('#sff-c').addEventListener('click',e=>{const b=e.target.closest('[data-c]');if(!b)return;color=b.dataset.c;el.querySelectorAll('#sff-c [data-c]').forEach(x=>{const on=x.dataset.c===color;x.setAttribute('aria-pressed',on);x.style.borderColor=on?'var(--ink)':'transparent'})});
+    el.querySelector('#sff').addEventListener('submit',async e=>{e.preventDefault();const v=k=>el.querySelector('#sff-'+k).value.trim();if(!v('n'))return toast('Nhập họ tên.');
+      const nid=id||uid();await put('staff',nid,{...s,name:v('n'),role:v('r'),phone:v('p').replace(/\D/g,''),startDate:v('d'),baseSalary:Number(v('s').replace(/\D/g,''))||0,color,active:s.active!==false});
+      toast(id?'Đã lưu hồ sơ':'Đã thêm '+v('n'));staffSheet(nid)});
+    el.querySelector('#sff-n').focus();
+  });
+  S.sheetView=null;
+}
+function copyPayroll(){
+  const mk=S.hr.month;const rows=activeStaff().map(s=>({s,p:payroll(s,mk)}));
+  const head=['Nhân viên','Lương cơ bản','Công','Lương theo công','Hoa hồng','Phạt muộn','Tạm ứng','Thực lĩnh'];
+  const lines=[settings().name+' – Bảng lương '+monthLabel(mk).toLowerCase(),head.join('\t'),...rows.map(({s,p})=>[s.name,p.base,p.cong+'/'+p.std,p.byDay,p.commission,p.latePen,p.adv,p.net].join('\t'))];
+  const txt=lines.join('\n');
+  if(navigator.clipboard)navigator.clipboard.writeText(txt).then(()=>toast('Đã chép bảng lương'),()=>toast('Trình duyệt không cho chép, hãy chụp màn hình.'));
+}
+
+/* ---------- SETTINGS ---------- */
+function settingsSheet(){
+  const st=settings(),t=T();
+  const svcs=all('services').sort((a,b)=>(a.name||'').localeCompare(b.name||'')),staff=all('staff'),pkgs=all('packages');
+  openSheet(`<div class="sheet-h"><h2>Cài đặt</h2><button class="btn sm ghost" type="button" data-act="close">Đóng</button></div>
+   <form class="form" id="st-name"><div class="field"><label for="st-n">Tên ${t.org.toLowerCase()}</label><div style="display:flex;gap:8px"><input class="input" id="st-n" value="${esc(st.name)}"><button class="btn" type="submit">Lưu</button></div></div></form>
+   <section class="panel"><div class="panel-h"><h2>Dịch vụ</h2><span class="count num">${svcs.length}</span></div><div class="list">${svcs.map(s=>`<div class="row"><div class="row-main"><b>${esc(s.name)}</b><span class="num">${money(s.price)} · ${s.duration||60} phút · hoa hồng ${s.commissionPct||0}% · quay lại sau ${s.recallDays||'—'} ngày</span></div></div>`).join('')||'<div class="empty">Chưa có dịch vụ.</div>'}</div>
+   <form class="form" id="st-sv" style="padding:12px 14px;border-top:1px solid var(--line)"><div class="form-row"><input class="input" id="sv-n" placeholder="Tên dịch vụ" required><input class="input num" id="sv-p" inputmode="numeric" placeholder="Giá (đ)" required></div><div class="form-row"><input class="input num" id="sv-d" inputmode="numeric" placeholder="Thời lượng (phút)"><input class="input num" id="sv-c" inputmode="numeric" placeholder="Hoa hồng %"></div><input class="input num" id="sv-r" inputmode="numeric" placeholder="Nhắc quay lại sau bao nhiêu ngày (ví dụ 30)"><button class="btn" type="submit">+ Thêm dịch vụ</button></form></section>
+   <section class="panel"><div class="panel-h"><h2>${t.staff}</h2><span class="count num">${staff.length}</span></div><div class="list">${staff.map(s=>`<div class="row"><i class="staff-dot" style="background:${esc(s.color)};width:12px;height:12px"></i><div class="row-main"><b>${esc(s.name)}</b><span>${esc(s.role||'')}</span></div></div>`).join('')||'<div class="empty">Chưa có nhân viên.</div>'}</div>
+   <form class="form" id="st-sf" style="padding:12px 14px;border-top:1px solid var(--line)"><div class="form-row"><input class="input" id="sf-n" placeholder="Tên" required><input class="input" id="sf-r" placeholder="Vai trò"></div><button class="btn" type="submit">+ Thêm ${t.staff.toLowerCase()}</button></form></section>
+   <section class="panel"><div class="panel-h"><h2>Gói ${t.course.toLowerCase()}</h2><span class="count num">${pkgs.length}</span></div><div class="list">${pkgs.map(k=>`<div class="row"><div class="row-main"><b>${esc(k.name)}</b><span class="num">${k.sessions} ${t.visit} · ${money(k.price)} · ${esc(serviceName(k.serviceId))}</span></div></div>`).join('')||'<div class="empty">Chưa có gói.</div>'}</div>
+   <form class="form" id="st-pk" style="padding:12px 14px;border-top:1px solid var(--line)"><input class="input" id="pk-n" placeholder="Tên gói, ví dụ: Trị mụn 10 buổi" required><div class="form-row"><select class="input" id="pk-s">${svcs.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')}</select><input class="input num" id="pk-k" inputmode="numeric" placeholder="Số ${t.visit}" required></div><input class="input num" id="pk-p" inputmode="numeric" placeholder="Giá gói (đ)" required><button class="btn" type="submit">+ Thêm gói</button></form></section>
+   <form class="form" id="st-hr"><div class="eyebrow">Nhân sự</div><div class="form-row"><div class="field"><label for="hr-wd">Công chuẩn/tháng</label><input class="input num" id="hr-wd" inputmode="numeric" value="${st.workDays||26}"></div><div class="field"><label for="hr-lp">Phạt đi muộn (đ/lần)</label><input class="input num" id="hr-lp" inputmode="numeric" value="${st.latePenalty!=null?st.latePenalty:30000}"></div></div><div class="field"><label for="hr-ss">Giờ vào ca (sau giờ này tính đi muộn)</label><input class="input" type="time" id="hr-ss" value="${esc(st.shiftStart||'08:30')}"></div><button class="btn" type="submit">Lưu cài đặt nhân sự</button></form>
+   <div class="infobox">Chế độ <b>Spa</b> và <b>Nha khoa</b> dùng hai bộ dữ liệu riêng, đổi ở nút trên cùng. Đây là cách VUA APP tùy biến theo ngành.</div>`,el=>{
+    const num=id=>Number((el.querySelector('#'+id).value||'').replace(/\D/g,''))||0,val=id=>el.querySelector('#'+id).value.trim();
+    el.querySelector('#st-hr').addEventListener('submit',async e=>{e.preventDefault();await put('settings','main',{...settings(),workDays:num('hr-wd')||26,latePenalty:num('hr-lp'),shiftStart:val('hr-ss')||'08:30'});toast('Đã lưu cài đặt nhân sự');});
+    el.querySelector('#st-name').addEventListener('submit',async e=>{e.preventDefault();await put('settings','main',{...st,name:val('st-n')||st.name});toast('Đã lưu tên');});
+    el.querySelector('#st-sv').addEventListener('submit',async e=>{e.preventDefault();await put('services',uid(),{name:val('sv-n'),price:num('sv-p'),duration:num('sv-d')||60,commissionPct:num('sv-c'),recallDays:num('sv-r')||(mode==='spa'?30:180)});toast('Đã thêm dịch vụ');});
+    el.querySelector('#st-sf').addEventListener('submit',async e=>{e.preventDefault();const colors=['#1E7A68','#B0476A','#3563B8','#A8690F','#6B4FB0','#2F8F5B'];await put('staff',uid(),{name:val('sf-n'),role:val('sf-r'),color:colors[all('staff').length%colors.length]});toast('Đã thêm');});
+    el.querySelector('#st-pk').addEventListener('submit',async e=>{e.preventDefault();await put('packages',uid(),{name:val('pk-n'),serviceId:val('pk-s'),sessions:num('pk-k')||1,price:num('pk-p')});toast('Đã thêm gói');});
+  });
+  S.sheetView=()=>{if(!document.activeElement||!$('#sheet').contains(document.activeElement)||document.activeElement.tagName==='BUTTON')settingsSheet()};
+}
+
+/* ---------- sheet ---------- */
+function openSheet(html,onMount){const el=$('#sheet');el.innerHTML=`<div class="sheet-back" data-act="close"></div><div class="sheet" role="dialog" aria-modal="true">${html}</div>`;el.hidden=false;if(onMount)onMount(el)}
+function closeSheet(){const el=$('#sheet');el.hidden=true;el.innerHTML='';S.sheetView=null}
+
+/* ---------- events ---------- */
+document.addEventListener('click',async e=>{
+  const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act,ds=b.dataset;
+  if(a!=='zalo')e.preventDefault();
+  try{switch(a){
+    case 'tab':S.tab=ds.tab;closeSheet();render();window.scrollTo(0,0);break;
+    case 'mode':if(ds.mode===mode)break;mode=ds.mode;try{localStorage.setItem('vua-mode',mode)}catch(x){}closeSheet();S.apptStaff='all';S.pos.customerId='';subscribe();render();toast('Đã chuyển sang chế độ '+T().org);break;
+    case 'settings':settingsSheet();break;
+    case 'close':closeSheet();break;
+    case 'zalo':{const m=ds.msg;if(m&&navigator.clipboard){navigator.clipboard.writeText(m).then(()=>toast('Đã chép tin nhắn mẫu, dán vào Zalo để gửi'),()=>toast('Mở Zalo… (không chép được tin nhắn)'))}break}
+    case 'contact':await put('contacts',`${ds.cid}_${TODAY}_${ds.kind}`,{customerId:ds.cid,kind:ds.kind,date:TODAY});toast('Đã đánh dấu đã liên hệ');break;
+    case 'status':await setStatus(ds.id,ds.s);break;
+    case 'appt':apptSheet(ds.id);break;
+    case 'appt-date':S.apptDate=ds.d;render();break;
+    case 'appt-shift':S.apptDate=addDays(S.apptDate,Number(ds.n));render();break;
+    case 'appt-staff':S.apptStaff=ds.id;render();break;
+    case 'new-appt':apptForm({customerId:ds.cid||''});break;
+    case 'cust':custSheet(ds.id);break;
+    case 'cust-f':S.custF=ds.f;render();break;
+    case 'new-cust':custForm();break;
+    case 'edit-cust':custForm(ds.id);break;
+    case 'pos-kind':S.pos.kind=ds.k;S.pos.amount='';S.pos.paid='';S.pos.saleId='';rerenderPOS();break;
+    case 'pos-method':S.pos.method=ds.m;rerenderPOS();break;
+    case 'pos-debt':case 'pos-course':closeSheet();S.tab='pos';S.pos={...S.pos,kind:a==='pos-debt'?'debt':'course',customerId:ds.cid,saleId:'',amount:'',paid:'',adding:false};rerenderPOS();window.scrollTo(0,0);break;
+    case 'pos-appt':{const ap=get('appointments',ds.id);closeSheet();S.tab='pos';S.pos={...S.pos,kind:'service',customerId:ap.customerId,serviceId:ap.serviceId,staffId:ap.staffId,appointmentId:ap.id,amount:'',paid:'',adding:false};rerenderPOS();window.scrollTo(0,0);break}
+    case 'period':S.period=ds.p;render();break;
+    case 'hr-view':S.hr.view=ds.v;render();break;
+    case 'hr-date':S.hr.date=ds.d;S.hr.view='att';render();break;
+    case 'hr-shift':{const nd=addDays(S.hr.date,Number(ds.n));if(nd<=TODAY){S.hr.date=nd;render()}break}
+    case 'hr-month':S.hr.month=ds.m;render();break;
+    case 'staff':staffSheet(ds.id);break;
+    case 'new-staff':staffForm();break;
+    case 'edit-staff':staffForm(ds.id);break;
+    case 'staff-toggle':{const st=get('staff',ds.id);await patch('staff',ds.id,{active:st.active===false});toast(st.active===false?'Đã cho đi làm lại':'Đã chuyển sang nghỉ việc, không còn hiện khi đặt lịch');break}
+    case 'att':{const cur=attDay(ds.sid,S.hr.date)||{};await setAtt(ds.sid,S.hr.date,cur.s===ds.s?{s:null}:{s:ds.s});break}
+    case 'att-in':{const D=S.hr.date,cur=attDay(ds.sid,D)||{},tm=D===TODAY?nowHM():(settings().shiftStart||'08:30');const late=tm>(settings().shiftStart||'08:30');await setAtt(ds.sid,D,{in:tm,s:cur.s&&cur.s!=='present'&&cur.s!=='late'?cur.s:(late?'late':'present')});toast('Vào ca '+tm+(late?' · đi muộn':''));break}
+    case 'att-out':{const D=S.hr.date,tm=D===TODAY?nowHM():'17:30';await setAtt(ds.sid,D,{out:tm});toast('Ra ca '+tm);break}
+    case 'att-all':{const D=S.hr.date;let n=0;for(const st of activeStaff()){if(!attDay(st.id,D)){await setAtt(st.id,D,{s:'present',in:settings().shiftStart||'08:30'});n++}}toast(n?'Đã chấm có mặt cho '+n+' người':'Mọi người đã được chấm công');break}
+    case 'copy-pay':copyPayroll();break;
+  }}catch(err){console.error(err)}
+});
+document.addEventListener('input',e=>{if(e.target.id==='cust-q'){S.custQ=e.target.value;render()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#sheet').hidden)closeSheet()});
+render();connect();
+})();
+</script>
+
+
+</body>
+</html>
