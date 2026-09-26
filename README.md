@@ -85,9 +85,12 @@ Mở app sẽ gặp màn hình đăng nhập. Mỗi vai trò chỉ thấy đúng
 | Quản lý kho | `kho` / `kho123` | Dịch vụ & gói, Sản phẩm & kho, Nhà cung cấp & nhập |
 | Nhân sự & lương | `nhansu` / `nhansu123` | Nhân viên, Xếp ca, Chấm công, Bảng lương |
 | Kế toán | `ketoan` / `ketoan123` | Bảng điều khiển, Hóa đơn, Chi phí, Báo cáo, Khuyến mãi |
-| Kỹ thuật viên / Bác sĩ | `nv` / `nv123` | Việc hôm nay, Lịch đặt chỗ, Chấm công (tự chấm công vào/ra ca) |
+| Kỹ thuật viên — Hoa | `hoa` / `hoa123` | Việc hôm nay, Lịch đặt chỗ, **tự chấm công của riêng Hoa** |
+| Kỹ thuật viên — Mai | `mai` / `mai123` | Việc hôm nay, Lịch đặt chỗ, **tự chấm công của riêng Mai** |
+| Kỹ thuật viên — Linh | `linh` / `linh123` | Việc hôm nay, Lịch đặt chỗ, **tự chấm công của riêng Linh** |
+| Kỹ thuật viên — Thảo | `thao` / `thao123` | Việc hôm nay, Lịch đặt chỗ, **tự chấm công của riêng Thảo** |
 
-Trên màn hình đăng nhập có sẵn khung "Tài khoản dùng thử" — bấm vào là điền nhanh để đổi vai trò, tiện cho việc kiểm tra từng bộ phận. Chủ/Quản lý vào **Tài khoản & phân quyền** (menu Hệ thống) để thêm/sửa/xóa tài khoản thật cho nhân viên, đổi mật khẩu, gán đúng vai trò.
+Trên màn hình đăng nhập có sẵn khung "Tài khoản dùng thử" — bấm vào là điền nhanh để đổi vai trò, tiện cho việc kiểm tra từng bộ phận. Chủ/Quản lý vào **Tài khoản & phân quyền** (menu Hệ thống) để thêm/sửa/xóa tài khoản thật cho nhân viên, đổi mật khẩu, gán đúng vai trò, và **liên kết mỗi tài khoản Kỹ thuật viên/Bác sĩ tới đúng hồ sơ nhân viên** — trang Chấm công khi đó chỉ hiện đúng 1 dòng của người đang đăng nhập với 2 nút to **Vào ca / Ra ca**, không thấy và không đụng được vào giờ công của người khác. Chủ/Quản lý và Nhân sự vẫn thấy đầy đủ bảng chấm công của tất cả mọi người như trước, kèm nút "Chấm tất cả có mặt" để chấm nhanh hàng loạt khi cần.
 
 **Giới hạn:** đây là khóa mềm ở phía trình duyệt (client-side), tài khoản và mật khẩu lưu trong `localStorage` của từng máy — phù hợp để phân luồng thao tác nội bộ và demo cho từng bộ phận, **không phải cơ chế bảo mật chống truy cập trái phép thực sự** (ai mở DevTools trên máy đó vẫn xem được danh sách tài khoản). Muốn bảo mật thật, cần bản có backend (mục dưới).
 

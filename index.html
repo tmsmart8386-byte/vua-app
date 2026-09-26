@@ -7294,16 +7294,22 @@ function staffAvatar(s,size){size=size||38;return `<div class="avatar" style="wi
 function attPill(a){if(!a||!a.s)return '<span class="pill st-booked">Chưa chấm công</span>';const x=ATT[a.s];return `<span class="pill ${x[3]}">${x[0]}${a.in?' · '+esc(a.in):''}${a.out?'–'+esc(a.out):''}</span>`}
 
 function hrAttendance(){
-  const D=S.hr.date,staff=activeStaff(),isToday=D===TODAY;
-  const H0=pageHead('att','Chấm công','Vào ca, ra ca, đi muộn, nghỉ phép và bảng công tháng');
+  const D=S.hr.date,isToday=D===TODAY;
+  const selfMode=S.auth&&S.auth.role==='tech';
+  const selfStaff=selfMode?get('staff',S.auth.staffId):null;
+  if(selfMode&&!selfStaff){
+    return pageHead('att','Chấm công','Tự chấm công vào ca, ra ca')+`<div class="empty">Tài khoản này chưa được liên kết với hồ sơ nhân viên. Nhờ Chủ/Quản lý vào <b>Tài khoản & phân quyền</b> để liên kết.</div>`;
+  }
+  const staff=selfMode?[selfStaff]:activeStaff();
+  const H0=pageHead('att','Chấm công',selfMode?`Tự chấm công vào ca, ra ca của ${T().staff.toLowerCase()} ${esc(selfStaff.name)}`:'Vào ca, ra ca, đi muộn, nghỉ phép và bảng công tháng');
   const cnt=k=>staff.filter(s=>{const a=attDay(s.id,D);return a&&a.s===k}).length;
   let h=H0+`<div class="head"><div><h2 style="font-size:18px">${isToday?'Hôm nay, ':''}${WD[parseYmd(D).getDay()]} ${dm(D)}</h2><span class="muted" style="font-size:13px">${cnt('present')} có mặt · ${cnt('late')} đi muộn · ${cnt('leave')} nghỉ phép · ${cnt('absent')} nghỉ không phép</span></div>
    <div class="chips"><button class="chip" type="button" data-act="hr-shift" data-n="-1">‹ Hôm trước</button><button class="chip" type="button" data-act="hr-date" data-d="${TODAY}">Hôm nay</button><button class="chip" type="button" data-act="hr-shift" data-n="1" ${D>=TODAY?'disabled':''}>Hôm sau ›</button></div></div>
-   <section class="panel"><div class="panel-h"><h2>Chấm công</h2><button class="btn sm" type="button" data-act="att-all" style="margin-left:auto">Chấm tất cả có mặt</button></div><div class="list">`;
+   <section class="panel"><div class="panel-h"><h2>Chấm công</h2>${selfMode?'':'<button class="btn sm" type="button" data-act="att-all" style="margin-left:auto">Chấm tất cả có mặt</button>'}</div><div class="list">`;
   h+=staff.length?staff.map(s=>{const a=attDay(s.id,D)||{};
     return `<div class="row">${staffAvatar(s,34)}<div class="row-main"><b>${esc(s.name)}</b><span class="num">${esc(shiftText(shiftOn(s.id,D)))} · ${a.in?'Vào '+esc(a.in):'Chưa vào ca'}${a.out?' · Ra '+esc(a.out):''}</span></div>
-     <div class="row-acts">${Object.entries(ATT).map(([k,v])=>`<button class="chip" type="button" data-act="att" data-sid="${s.id}" data-s="${k}" aria-pressed="${a.s===k}" style="padding:5px 10px;font-size:12.5px">${v[0]}</button>`).join('')}
-     <button class="btn sm" type="button" data-act="att-in" data-sid="${s.id}">${a.in?'Sửa giờ vào':'Vào ca'}</button><button class="btn sm" type="button" data-act="att-out" data-sid="${s.id}" ${!a.in?'disabled':''}>Ra ca</button></div></div>`}).join(''):'<div class="empty">Chưa có nhân viên.</div>';
+     <div class="row-acts">${selfMode?'':Object.entries(ATT).map(([k,v])=>`<button class="chip" type="button" data-act="att" data-sid="${s.id}" data-s="${k}" aria-pressed="${a.s===k}" style="padding:5px 10px;font-size:12.5px">${v[0]}</button>`).join('')}
+     <button class="btn ${selfMode?'primary':'sm'}" type="button" data-act="att-in" data-sid="${s.id}">${a.in?'Sửa giờ vào':'Vào ca'}</button><button class="btn ${selfMode?'':'sm'}" type="button" data-act="att-out" data-sid="${s.id}" ${!a.in?'disabled':''}>Ra ca</button></div></div>`}).join(''):'<div class="empty">Chưa có nhân viên.</div>';
   h+=`</div></section>`;
   const mk=monthKey(D),n=monthKey(TODAY)===mk?Number(TODAY.slice(8)):daysInMonth(mk);
   let grid=`<table class="attgrid"><thead><tr><th class="sticky">Nhân viên</th>`;
@@ -7515,18 +7521,32 @@ const DEFAULT_USERS=[
  {id:'u-inventory',name:'Quản lý kho Bình',username:'kho',password:'kho123',role:'inventory'},
  {id:'u-hr',name:'Nhân sự Lan',username:'nhansu',password:'nhansu123',role:'hr'},
  {id:'u-accountant',name:'Kế toán Mai',username:'ketoan',password:'ketoan123',role:'accountant'},
- {id:'u-tech',name:'Kỹ thuật viên Trang',username:'nv',password:'nv123',role:'tech'}
+ {id:'u-tech-hoa',name:'Hoa',username:'hoa',password:'hoa123',role:'tech',staffId:'st1'},
+ {id:'u-tech-mai',name:'Mai',username:'mai',password:'mai123',role:'tech',staffId:'st2'},
+ {id:'u-tech-linh',name:'Linh',username:'linh',password:'linh123',role:'tech',staffId:'st3'},
+ {id:'u-tech-thao',name:'Thảo',username:'thao',password:'thao123',role:'tech',staffId:'st4'}
 ];
 function loadUsers(){try{const u=JSON.parse(localStorage.getItem('vua-users')||'null');return Array.isArray(u)&&u.length?u:null}catch(e){return null}}
 function saveUsers(list){try{localStorage.setItem('vua-users',JSON.stringify(list))}catch(e){}}
-function allUsers(){let u=loadUsers();if(!u){u=DEFAULT_USERS.map(x=>({...x}));saveUsers(u)}return u}
+function allUsers(){
+  let u=loadUsers();
+  if(!u){u=DEFAULT_USERS.map(x=>({...x}));saveUsers(u);return u}
+  let changed=false;
+  DEFAULT_USERS.forEach(d=>{
+    const i=u.findIndex(x=>x.username===d.username);
+    if(i===-1){u.push({...d});changed=true}
+    else if(d.staffId&&!u[i].staffId){u[i]={...u[i],staffId:d.staffId};changed=true}
+  });
+  if(changed)saveUsers(u);
+  return u;
+}
 function loadSession(){try{return JSON.parse(localStorage.getItem('vua-session')||'null')}catch(e){return null}}
 function saveSession(u){try{localStorage.setItem('vua-session',JSON.stringify(u))}catch(e){}}
 function clearSession(){try{localStorage.removeItem('vua-session')}catch(e){}}
 function roleConf(){const r=S.auth&&S.auth.role;if(!r||r==='owner')return null;return ROLE_TABS[r]||{tabs:[],home:'help'}}
 function canAccess(tab){const rc=roleConf();return !rc||rc.tabs.includes(tab)}
 function homeTab(){const rc=roleConf();return rc?rc.home:'dash'}
-function tryLogin(u,p){const usr=allUsers().find(x=>x.username.toLowerCase()===String(u||'').trim().toLowerCase()&&x.password===p);if(!usr)return null;const sess={id:usr.id,name:usr.name,username:usr.username,role:usr.role};saveSession(sess);return sess}
+function tryLogin(u,p){const usr=allUsers().find(x=>x.username.toLowerCase()===String(u||'').trim().toLowerCase()&&x.password===p);if(!usr)return null;const sess={id:usr.id,name:usr.name,username:usr.username,role:usr.role,staffId:usr.staffId||''};saveSession(sess);return sess}
 
 /* ---------- theme ---------- */
 function applyTheme(){
@@ -8265,13 +8285,14 @@ function viewStaff(){
 
 /* ---------- TÀI KHOẢN & PHÂN QUYỀN ---------- */
 function userForm(id){
-  const u=id?allUsers().find(x=>x.id===id):{role:'reception'};
+  const u=id?allUsers().find(x=>x.id===id):{role:'reception',staffId:''};
   formSheet({title:id?'Sửa tài khoản':'Thêm tài khoản đăng nhập',data:u,
     fields:[
      {k:'name',l:'Họ tên',req:true},
      {k:'username',l:'Tên đăng nhập',req:true},
      {k:'password',l:'Mật khẩu',req:true},
-     {k:'role',l:'Vai trò / bộ phận',type:'select',opts:ROLES,req:true}
+     {k:'role',l:'Vai trò / bộ phận',type:'select',opts:ROLES,req:true},
+     {k:'staffId',l:'Liên kết tới nhân viên (để tự chấm công của đúng người)',type:'select',opts:[['','— Không liên kết —'],...all('staff').map(s=>[s.id,s.name+(s.role?' · '+s.role:'')])]}
     ],
     onSave:async v=>{
       const list=allUsers().slice(),uname=v.username.trim();
@@ -8280,7 +8301,7 @@ function userForm(id){
         const i=list.findIndex(x=>x.id===id);
         if(list[i].role==='owner'&&v.role!=='owner'&&list.filter(x=>x.role==='owner').length<=1){toast('Cần giữ lại ít nhất một tài khoản Chủ/Quản lý.');return false}
         list[i]={...list[i],...v,username:uname};
-        if(S.auth&&S.auth.id===id){S.auth={...S.auth,name:v.name,role:v.role,username:uname};saveSession(S.auth)}
+        if(S.auth&&S.auth.id===id){S.auth={...S.auth,name:v.name,role:v.role,username:uname,staffId:v.staffId};saveSession(S.auth)}
       }else list.push({id:uid(),...v,username:uname});
       saveUsers(list);toast(id?'Đã lưu tài khoản':'Đã thêm tài khoản');render();
     }});
@@ -8294,6 +8315,7 @@ function viewUsers(){
      {l:'Tên đăng nhập',v:u=>`<span class="num">${esc(u.username)}</span>`,x:u=>u.username},
      {l:'Mật khẩu',v:u=>`<span class="num">${esc(u.password)}</span>`,x:u=>u.password},
      {l:'Vai trò',v:u=>`<span class="role-badge">${esc(roleLabel(u.role))}</span>`,x:u=>roleLabel(u.role)},
+     {l:'Liên kết nhân viên',v:u=>{const s=u.staffId&&get('staff',u.staffId);return s?esc(s.name):'—'},x:u=>{const s=u.staffId&&get('staff',u.staffId);return s?s.name:''}},
      {l:'Được vào những đâu',v:u=>u.role==='owner'?'Toàn bộ hệ thống':esc((ROLE_TABS[u.role]||{}).desc||''),x:u=>u.role}
     ],
     add:()=>userForm(),edit:id=>userForm(id),delName:u=>u.name,
