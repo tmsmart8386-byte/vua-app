@@ -8055,9 +8055,11 @@ function viewWait(){
   const F=S.waitF;let rows=all('waitlist');if(F!=='all')rows=rows.filter(w=>w.status===F);
   rows.sort((a,b)=>(a.status==='waiting'?0:1)-(b.status==='waiting'?0:1)||(a.date||'').localeCompare(b.date||''));
   const filters=chipsRow('wait-f',F,[['waiting','Đang chờ'],['booked','Đã xếp lịch'],['cancelled','Đã hủy'],['all','Tất cả']]);
-  const leadUrl=location.origin+'/dang-ky.html'+(mode==='nhakhoa'?'?nganh=nhakhoa':'');
+  const q=mode==='nhakhoa'?'?nganh=nhakhoa':'';
+  const catalogUrl=location.origin+'/dich-vu.html'+q;
+  const formUrl=location.origin+'/dang-ky.html'+q;
   return pageHead('wait','Danh sách chờ',`Ghi lại ${T().cust} muốn đặt khi đã kín lịch, xếp lịch ngay khi có chỗ trống`)+
-   `<div class="warnbox" style="margin-bottom:14px">📎 Trang đăng ký lead tự động: <a href="${esc(leadUrl)}" target="_blank" rel="noopener"><b>${esc(leadUrl)}</b></a> — dán link này vào bio Facebook/TikTok/Zalo hoặc nút CTA quảng cáo. Khách điền form xong, bấm <b>Đồng bộ lead mới</b> bên dưới để kéo về đây.</div>`+
+   `<div class="warnbox" style="margin-bottom:14px">📎 <b>Trang giới thiệu dịch vụ + thu lead:</b> <a href="${esc(catalogUrl)}" target="_blank" rel="noopener"><b>${esc(catalogUrl)}</b></a> — khách xem bảng giá, chọn dịch vụ rồi mới điền thông tin. Dán link này vào bio Facebook/TikTok/Zalo hoặc nút CTA quảng cáo.<br>Cần form đăng ký nhanh không qua bảng giá thì dùng: <a href="${esc(formUrl)}" target="_blank" rel="noopener">${esc(formUrl)}</a>.<br>Khách điền xong, bấm <b>Đồng bộ lead mới</b> bên dưới để kéo về đây.</div>`+
    dataTable({key:'wait',title:'Danh sách chờ',exportName:'danh-sach-cho',rows,filters,
     cols:[{l:'Họ tên',v:w=>`<b>${esc(w.name)}</b>`,x:w=>w.name},{l:'Điện thoại',v:w=>esc(phoneFmt(w.phone)),x:w=>w.phone||''},{l:'Dịch vụ',v:w=>esc(w.serviceId?serviceName(w.serviceId):'—'),x:w=>w.serviceId?serviceName(w.serviceId):''},{l:T().staff,v:w=>esc(w.staffId?staffOf(w.staffId).name:'Ai cũng được'),x:w=>w.staffId?staffOf(w.staffId).name:''},
      {l:'Ngày muốn',v:w=>w.date?`${WD[parseYmd(w.date).getDay()]} ${dm(w.date)}`:'—',x:w=>w.date||''},{l:'Khung giờ',v:w=>esc(w.slot||'—'),x:w=>w.slot||''},{l:'Ghi chú',cls:'wrap',v:w=>esc(w.note||''),x:w=>w.note||''},{l:'Trạng thái',v:w=>`<span class="pill ${(WSTAT[w.status]||WSTAT.waiting)[1]}">${(WSTAT[w.status]||WSTAT.waiting)[0]}</span>`,x:w=>(WSTAT[w.status]||WSTAT.waiting)[0]}],
