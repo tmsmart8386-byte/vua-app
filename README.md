@@ -94,6 +94,20 @@ Trên màn hình đăng nhập có sẵn khung "Tài khoản dùng thử" — b�
 
 **Giới hạn:** đây là khóa mềm ở phía trình duyệt (client-side), tài khoản và mật khẩu lưu trong `localStorage` của từng máy — phù hợp để phân luồng thao tác nội bộ và demo cho từng bộ phận, **không phải cơ chế bảo mật chống truy cập trái phép thực sự** (ai mở DevTools trên máy đó vẫn xem được danh sách tài khoản). Muốn bảo mật thật, cần bản có backend (mục dưới).
 
+## Thu lead tự động
+
+Có sẵn 1 trang đăng ký công khai `dang-ky.html` — dán link này vào bio Facebook/TikTok, nút CTA quảng cáo, hoặc tin nhắn Zalo:
+
+```
+https://vua-app.vercel.app/dang-ky.html
+```
+
+Khách điền Họ tên + SĐT + Dịch vụ quan tâm → lead lưu tự động vào kho dữ liệu chung (Vercel Blob), không phụ thuộc máy nào. Thêm `?src=facebook`, `?src=tiktok`, `?src=zalo` vào cuối link để biết lead đến từ đâu; thêm `?nganh=nhakhoa` nếu muốn form mặc định qua khối Nha khoa.
+
+Trong app, vào **Danh sách chờ** → bấm **Đồng bộ lead mới**: mọi lead chưa xử lý sẽ tự động thêm vào danh sách chờ kèm ghi chú "Quan tâm… · Nguồn…", sẵn sàng để bấm **Xếp lịch ngay**.
+
+**Lưu ý:** tính năng này chạy bằng API phía máy chủ (Vercel Serverless Function + Vercel Blob), nên **chỉ hoạt động trên bản Vercel** (`vua-app.vercel.app`), không chạy được trên GitHub Pages hay khi mở file `index.html` trực tiếp (2 cách đó không có backend).
+
 ## Chưa có
 
 - Xác thực phía máy chủ (hash mật khẩu, chống truy cập trái phép thực sự), nhiều cơ sở dùng chung trên máy chủ
