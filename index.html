@@ -87,6 +87,8 @@ button svg,a svg,label svg,.pos-cat svg,.cart-h svg,.panel-h svg,.card-h svg,.he
 .side-foot .avatar{background:var(--accent);color:#fff}
 .side-foot b{display:block;font-size:13.5px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .side-foot small{font-size:11.5px;color:var(--side-ink);opacity:.75}
+.side-foot .btn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.16);color:#fff;flex:none;padding:7px 9px}
+.side-foot .role-badge{background:rgba(255,255,255,.14);color:#fff}
 .side-foot>div:not(.avatar){min-width:0;flex:1}
 .mode-pill{display:flex;border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:3px;margin:12px 16px 6px}
 .mode-pill button{flex:1;border:0;background:transparent;border-radius:999px;padding:5px 12px;font-size:12.5px;font-weight:700;color:var(--side-ink)}
@@ -491,6 +493,19 @@ h2{font-size:16px;margin:0;font-weight:700}
   .tile .v{font-size:19px}
   .content{gap:14px}
 }
+.auth-wrap{min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:24px 16px}
+.auth-card{width:100%;max-width:420px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:28px 26px;box-shadow:0 20px 50px rgba(0,0,0,.12)}
+.auth-brand{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.auth-brand h1{font-size:19px;margin:0}
+.auth-brand p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.auth-err{background:var(--accent-tint);color:var(--accent-2);border:1px solid var(--accent-soft);border-radius:10px;padding:9px 12px;font-size:13px;margin-bottom:12px}
+.auth-demo{margin-top:20px;border-top:1px solid var(--line);padding-top:14px}
+.auth-demo p{margin:0 0 10px;font-size:12.5px;color:var(--muted)}
+.auth-demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.auth-demo-grid button{text-align:left;border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:8px 10px;cursor:pointer;font-family:inherit}
+.auth-demo-grid button b{display:block;font-size:12.5px}
+.auth-demo-grid button span{display:block;font-size:11px;color:var(--muted);margin-top:1px}
+.role-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent-soft);color:var(--accent-2);border-radius:999px;padding:3px 10px;font-size:11.5px;font-weight:700}
 </style>
 
 <script id="seed-data" type="application/json">{
@@ -6832,7 +6847,8 @@ h2{font-size:16px;margin:0;font-weight:700}
 }</script>
 </head>
 <body>
-<div class="app">
+<div id="authScreen" class="auth-wrap" hidden></div>
+<div class="app" id="appRoot">
   <aside class="side" id="side" aria-label="Điều hướng chính">
     <div class="side-brand" id="brand"></div>
     <div class="mode-pill" role="group" aria-label="Chế độ ngành">
@@ -6903,6 +6919,8 @@ const S={tab:'dash',todayTab:'today',tq:{},sel:{},sort:{},gq:'',bell:false,navOp
   hr:{view:'overview',date:TODAY,month:TODAY.slice(0,7),week:weekStartOf(TODAY),brush:''},sheetView:null};
 COLS.forEach(c=>S.data[c]=new Map());
 S.cart={items:[],customerId:'',q:'',adding:false,newName:'',newPhone:'',staffId:'',discPct:'',promoCode:'',promoId:'',taxPct:'0',tip:'',method:'cash',paid:'',appointmentId:'',note:''};
+S.auth=loadSession();S.authErr='';S.authForm={u:'',p:''};
+if(S.auth)S.tab=homeTab();
 let db=null, unsubs=[];
 const T=()=>TERMS[mode];
 const all=c=>Array.from(S.data[c].values());
@@ -7452,7 +7470,9 @@ const ICONS={
  truck:svgI('<path d="M1 3h15v13H1zM16 8h4l3 3v5h-7z"/>'),
  building:svgI('<path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h1M14 9h1M9 13h1M14 13h1M9 17h1M14 17h1"/>'),
  db:svgI('<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>'),
- x:svgI('<path d="M18 6L6 18M6 6l12 12"/>')
+ x:svgI('<path d="M18 6L6 18M6 6l12 12"/>'),
+ lock:svgI('<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>'),
+ users:svgI('<circle cx="8.5" cy="8" r="3.5"/><path d="M2 21v-1a5 5 0 0 1 5-5h2a5 5 0 0 1 5 5v1"/><circle cx="17" cy="8.5" r="2.6"/><path d="M15.5 13c2.5.3 4.5 2 4.5 4.5V21"/>')
 };
 const I=n=>ICONS[n]||'';
 const THEMES=[['rose','Hồng Rose Gold','#E0156B','#1B1D2E'],['emerald','Ngọc lục bảo','#1E7A68','#14211D'],['lavender','Oải hương','#7C4DDB','#1E1A2E'],['ocean','Xanh đại dương','#1D6FD6','#131C2E'],['coral','San hô','#E8573A','#2A1C1A'],['champagne','Champagne','#B7862B','#231F17'],['wine','Rượu vang','#9E1B42','#241419'],['mint','Bạc hà','#0E9C8A','#10231F'],['graphite','Than chì','#3B4252','#15171C'],['peach','Đào hồng','#E26D8F','#2B2025']];
@@ -7462,12 +7482,51 @@ const NAV=[
  ['Dịch vụ & hàng hóa',[['svc','Dịch vụ & gói','svc'],['prod','Sản phẩm & kho','prod'],['supp','Nhà cung cấp & nhập','supp']]],
  ['Nhân sự & lương',[['staff','Nhân viên','staff'],['roster','Xếp ca','roster'],['att','Chấm công','att'],['payroll','Bảng lương','pay']]],
  ['Tài chính & phát triển',[['inv','Hóa đơn','inv'],['exp','Chi phí','exp'],['report','Báo cáo','report'],['promo','Khuyến mãi & tiếp thị','promo']]],
- ['Hệ thống',[['settings','Cài đặt & giao diện','settings'],['help','Hướng dẫn sử dụng','help']]]
+ ['Hệ thống',[['users','Tài khoản & phân quyền','users'],['settings','Cài đặt & giao diện','settings'],['help','Hướng dẫn sử dụng','help']]]
 ];
 const TABBAR=[['dash','Tổng quan','dash'],['cal','Lịch','cal'],['customers','Khách','crm'],['pos','Thu ngân','pos'],['menu','Menu','menu']];
 const navLabel=l=>typeof l==='function'?l():l;
 const METHODS2={cash:'Tiền mặt',transfer:'Chuyển khoản',card:'Thẻ',ewallet:'Ví điện tử'};
 const EXP_CATS=['Tiền mặt bằng','Điện nước, internet','Lương thưởng','Nhập hàng','Vật tư tiêu hao','Marketing','Sửa chữa, thiết bị','Thuế, phí','Khác'];
+
+/* ---------- đăng nhập & phân quyền ---------- */
+const ROLES=[
+ ['owner','Chủ / Quản lý'],
+ ['reception','Lễ tân'],
+ ['cashier','Thu ngân'],
+ ['inventory','Quản lý kho'],
+ ['hr','Nhân sự & lương'],
+ ['accountant','Kế toán'],
+ ['tech','Kỹ thuật viên / Bác sĩ']
+];
+const roleLabel=r=>(ROLES.find(x=>x[0]===r)||[,r])[1]||r;
+const ROLE_TABS={
+ reception:{tabs:['today','customers','appts','cal','wait','notes','help'],home:'today',desc:'Đặt lịch, chăm sóc khách, không thấy doanh thu/lương'},
+ cashier:{tabs:['pos','inv','customers','help'],home:'pos',desc:'Bán hàng, thu tiền, xem hóa đơn'},
+ inventory:{tabs:['svc','prod','supp','help'],home:'prod',desc:'Quản lý dịch vụ, tồn kho, nhập hàng'},
+ hr:{tabs:['staff','roster','att','payroll','help'],home:'staff',desc:'Hồ sơ nhân viên, xếp ca, chấm công, lương'},
+ accountant:{tabs:['dash','inv','exp','report','promo','help'],home:'report',desc:'Doanh thu, chi phí, báo cáo, khuyến mãi'},
+ tech:{tabs:['today','cal','att','help'],home:'today',desc:'Xem lịch làm việc và tự chấm công'}
+};
+const DEFAULT_USERS=[
+ {id:'u-owner',name:'Chủ tiệm',username:'admin',password:'admin123',role:'owner'},
+ {id:'u-reception',name:'Lễ tân An',username:'letan',password:'letan123',role:'reception'},
+ {id:'u-cashier',name:'Thu ngân Hà',username:'thungan',password:'thungan123',role:'cashier'},
+ {id:'u-inventory',name:'Quản lý kho Bình',username:'kho',password:'kho123',role:'inventory'},
+ {id:'u-hr',name:'Nhân sự Lan',username:'nhansu',password:'nhansu123',role:'hr'},
+ {id:'u-accountant',name:'Kế toán Mai',username:'ketoan',password:'ketoan123',role:'accountant'},
+ {id:'u-tech',name:'Kỹ thuật viên Trang',username:'nv',password:'nv123',role:'tech'}
+];
+function loadUsers(){try{const u=JSON.parse(localStorage.getItem('vua-users')||'null');return Array.isArray(u)&&u.length?u:null}catch(e){return null}}
+function saveUsers(list){try{localStorage.setItem('vua-users',JSON.stringify(list))}catch(e){}}
+function allUsers(){let u=loadUsers();if(!u){u=DEFAULT_USERS.map(x=>({...x}));saveUsers(u)}return u}
+function loadSession(){try{return JSON.parse(localStorage.getItem('vua-session')||'null')}catch(e){return null}}
+function saveSession(u){try{localStorage.setItem('vua-session',JSON.stringify(u))}catch(e){}}
+function clearSession(){try{localStorage.removeItem('vua-session')}catch(e){}}
+function roleConf(){const r=S.auth&&S.auth.role;if(!r||r==='owner')return null;return ROLE_TABS[r]||{tabs:[],home:'help'}}
+function canAccess(tab){const rc=roleConf();return !rc||rc.tabs.includes(tab)}
+function homeTab(){const rc=roleConf();return rc?rc.home:'dash'}
+function tryLogin(u,p){const usr=allUsers().find(x=>x.username.toLowerCase()===String(u||'').trim().toLowerCase()&&x.password===p);if(!usr)return null;const sess={id:usr.id,name:usr.name,username:usr.username,role:usr.role};saveSession(sess);return sess}
 
 /* ---------- theme ---------- */
 function applyTheme(){
@@ -7687,9 +7746,10 @@ function renderShell(){
   $('#brand').innerHTML=`<div class="logo">${st.logo?`<img src="${esc(st.logo)}" alt="">`:I('logo')}</div><div style="min-width:0"><b>${esc(st.name||'VUA APP')}</b><small>${mode==='spa'?'Spa & thẩm mỹ':'Nha khoa'}</small></div>`;
   $('#m-spa').setAttribute('aria-pressed',mode==='spa');$('#m-nk').setAttribute('aria-pressed',mode==='nhakhoa');
   const badges={today:todayTaskCount(),wait:all('waitlist').filter(x=>x.status==='waiting').length,prod:all('products').filter(p=>p.active!==false&&(p.stock||0)<=(p.minStock||0)).length};
-  $('#nav').innerHTML=NAV.map(([g,items])=>`<div class="side-group">${g}</div>${items.map(([k,l,ic])=>`<button type="button" data-act="tab" data-tab="${k}" ${S.tab===k?'aria-current="page"':''}>${I(ic)}<span>${esc(navLabel(l))}</span>${badges[k]?`<span class="badge num">${badges[k]}</span>`:''}</button>`).join('')}`).join('');
-  $('#sidefoot').innerHTML=`<div class="avatar">${esc(initials(st.owner||'Quản lý'))}</div><div><b>${esc(st.owner||'Quản lý')}</b><small>${WD[new Date().getDay()]==='CN'?'Chủ nhật':'Thứ '+(new Date().getDay()+1)}, ${dm(TODAY)}/${TODAY.slice(0,4)}</small></div>`;
-  $('#tabbar').innerHTML=TABBAR.map(([k,l,ic])=>`<button type="button" data-act="${k==='menu'?'nav-open':'tab'}" data-tab="${k}" ${S.tab===k?'aria-current="page"':''}>${I(ic)}<span>${k==='customers'?(mode==='spa'?'Khách':'Bệnh nhân'):l}</span></button>`).join('');
+  $('#nav').innerHTML=NAV.map(([g,items])=>{const vis=items.filter(([k])=>canAccess(k));if(!vis.length)return '';return `<div class="side-group">${g}</div>${vis.map(([k,l,ic])=>`<button type="button" data-act="tab" data-tab="${k}" ${S.tab===k?'aria-current="page"':''}>${I(ic)}<span>${esc(navLabel(l))}</span>${badges[k]?`<span class="badge num">${badges[k]}</span>`:''}</button>`).join('')}`}).join('');
+  const au=S.auth;
+  $('#sidefoot').innerHTML=au?`<div class="avatar">${esc(initials(au.name||'ND'))}</div><div style="min-width:0"><b>${esc(au.name)}</b><small><span class="role-badge">${esc(roleLabel(au.role))}</span></small></div><button class="btn sm ghost" type="button" data-act="logout" title="Đăng xuất" aria-label="Đăng xuất" style="margin-left:auto">${I('lock')}</button>`:`<div class="avatar">${esc(initials(st.owner||'Quản lý'))}</div><div><b>${esc(st.owner||'Quản lý')}</b><small>${WD[new Date().getDay()]==='CN'?'Chủ nhật':'Thứ '+(new Date().getDay()+1)}, ${dm(TODAY)}/${TODAY.slice(0,4)}</small></div>`;
+  $('#tabbar').innerHTML=TABBAR.filter(([k])=>k==='menu'||canAccess(k)).map(([k,l,ic])=>`<button type="button" data-act="${k==='menu'?'nav-open':'tab'}" data-tab="${k}" ${S.tab===k?'aria-current="page"':''}>${I(ic)}<span>${k==='customers'?(mode==='spa'?'Khách':'Bệnh nhân'):l}</span></button>`).join('');
   const cur=st.accent||(()=>{try{return localStorage.getItem('vua-accent')}catch(e){return ''}})()||'rose';
   $('#theme-sel').innerHTML=THEMES.map(([k,l],i)=>`<option value="${k}" ${k===cur?'selected':''}>${i+1}. ${l}</option>`).join('');
   const nt=notifications();$('#bell').innerHTML=I('bell')+(nt.length?`<span class="dotn">${nt.length}</span>`:'');$('#bell').setAttribute('aria-label',`Thông báo (${nt.length})`);
@@ -8203,6 +8263,50 @@ function viewStaff(){
     del:async id=>{if(all('appointments').some(a=>a.staffId===id)){await patch('staff',id,{active:false});toast('Nhân viên đã có lịch sử nên được chuyển sang “Đã nghỉ” thay vì xóa.')}else await del('staff',id)}});
 }
 
+/* ---------- TÀI KHOẢN & PHÂN QUYỀN ---------- */
+function userForm(id){
+  const u=id?allUsers().find(x=>x.id===id):{role:'reception'};
+  formSheet({title:id?'Sửa tài khoản':'Thêm tài khoản đăng nhập',data:u,
+    fields:[
+     {k:'name',l:'Họ tên',req:true},
+     {k:'username',l:'Tên đăng nhập',req:true},
+     {k:'password',l:'Mật khẩu',req:true},
+     {k:'role',l:'Vai trò / bộ phận',type:'select',opts:ROLES,req:true}
+    ],
+    onSave:async v=>{
+      const list=allUsers().slice(),uname=v.username.trim();
+      if(list.some(x=>x.id!==id&&x.username.toLowerCase()===uname.toLowerCase())){toast('Tên đăng nhập đã có người dùng, chọn tên khác.');return false}
+      if(id){
+        const i=list.findIndex(x=>x.id===id);
+        if(list[i].role==='owner'&&v.role!=='owner'&&list.filter(x=>x.role==='owner').length<=1){toast('Cần giữ lại ít nhất một tài khoản Chủ/Quản lý.');return false}
+        list[i]={...list[i],...v,username:uname};
+        if(S.auth&&S.auth.id===id){S.auth={...S.auth,name:v.name,role:v.role,username:uname};saveSession(S.auth)}
+      }else list.push({id:uid(),...v,username:uname});
+      saveUsers(list);toast(id?'Đã lưu tài khoản':'Đã thêm tài khoản');render();
+    }});
+}
+function viewUsers(){
+  const rows=allUsers();
+  return pageHead('users','Tài khoản & phân quyền','Tạo tài khoản đăng nhập riêng cho từng vị trí — lễ tân, thu ngân, kho, nhân sự, kế toán, kỹ thuật viên. Mỗi vai trò chỉ thấy đúng menu của bộ phận mình để vận hành và kiểm tra độc lập.')+
+   dataTable({key:'users',rows,noExport:true,ph:'Tìm theo tên, tài khoản, vai trò…',
+    cols:[
+     {l:'Họ tên',v:u=>`<b>${esc(u.name)}</b>`,x:u=>u.name},
+     {l:'Tên đăng nhập',v:u=>`<span class="num">${esc(u.username)}</span>`,x:u=>u.username},
+     {l:'Mật khẩu',v:u=>`<span class="num">${esc(u.password)}</span>`,x:u=>u.password},
+     {l:'Vai trò',v:u=>`<span class="role-badge">${esc(roleLabel(u.role))}</span>`,x:u=>roleLabel(u.role)},
+     {l:'Được vào những đâu',v:u=>u.role==='owner'?'Toàn bộ hệ thống':esc((ROLE_TABS[u.role]||{}).desc||''),x:u=>u.role}
+    ],
+    add:()=>userForm(),edit:id=>userForm(id),delName:u=>u.name,
+    del:async id=>{
+      const list=allUsers(),u=list.find(x=>x.id===id);
+      if(u&&u.role==='owner'&&list.filter(x=>x.role==='owner').length<=1){toast('Cần giữ lại ít nhất một tài khoản Chủ/Quản lý.');return}
+      saveUsers(list.filter(x=>x.id!==id));
+      if(S.auth&&S.auth.id===id){clearSession();S.auth=null}
+      render();
+    }})+
+   `<section class="panel" style="margin-top:16px"><div class="panel-h"><h2>Quyền theo từng vai trò</h2></div><div class="list">${ROLES.map(([k,l])=>`<div class="row"><div class="row-main"><b>${esc(l)}</b><span>${k==='owner'?'Toàn quyền: xem mọi trang, quản lý tài khoản và cài đặt hệ thống.':esc((ROLE_TABS[k]||{}).desc||'')}</span></div></div>`).join('')}</div></section>`;
+}
+
 /* ---------- EXPENSES ---------- */
 function expForm(id){
   const e=id?get('expenses',id):{date:TODAY,category:EXP_CATS[0],method:'cash'};
@@ -8470,12 +8574,42 @@ let rq=0;
 function scheduleRender(){if(rq)return;rq=requestAnimationFrame(()=>{rq=0;render();if(S.sheetView)S.sheetView()})}
 const VIEWS={dash:()=>viewDash(),today:()=>viewToday(),pos:()=>viewPOS(),customers:()=>viewCustomers(),appts:()=>viewApptList(),cal:()=>viewCal(),wait:()=>viewWait(),notes:()=>viewNotes(),
   svc:()=>viewSvc(),prod:()=>viewProd(),supp:()=>viewSupp(),staff:()=>viewStaff(),roster:()=>hrRoster(),att:()=>hrAttendance(),payroll:()=>hrPayroll(),
-  inv:()=>viewInv(),exp:()=>viewExp(),report:()=>viewReport(),promo:()=>viewPromo(),settings:()=>viewSettings(),help:()=>viewHelp()};
+  inv:()=>viewInv(),exp:()=>viewExp(),report:()=>viewReport(),promo:()=>viewPromo(),settings:()=>viewSettings(),help:()=>viewHelp(),users:()=>viewUsers()};
+function renderAuth(){
+  $('#appRoot').hidden=true;$('#tabbar').hidden=true;closeSheet();
+  const el=$('#authScreen');el.hidden=false;
+  const F=S.authForm;
+  el.innerHTML=`<div class="auth-card">
+    <div class="auth-brand"><div class="logo">${I('logo')}</div><div><h1>${esc(settings().name||'VUA APP')}</h1><p>Đăng nhập để vào đúng khu vực làm việc của bạn</p></div></div>
+    ${S.authErr?`<div class="auth-err">${esc(S.authErr)}</div>`:''}
+    <form class="form" id="authForm">
+      <div class="field"><label for="au-u">Tên đăng nhập</label><input class="input" id="au-u" autocomplete="username" value="${esc(F.u)}" autofocus></div>
+      <div class="field"><label for="au-p">Mật khẩu</label><input class="input" id="au-p" type="password" autocomplete="current-password" value="${esc(F.p)}"></div>
+      <button class="btn primary" type="submit">Đăng nhập</button>
+    </form>
+    <div class="auth-demo"><p>Tài khoản dùng thử theo từng bộ phận (bấm để điền nhanh):</p>
+      <div class="auth-demo-grid">${allUsers().map(u=>`<button type="button" data-act="auth-fill" data-u="${esc(u.username)}" data-p="${esc(u.password)}"><b>${esc(roleLabel(u.role))}</b><span>${esc(u.username)} / ${esc(u.password)}</span></button>`).join('')}</div>
+    </div>
+  </div>`;
+  bindAuth();
+}
+function bindAuth(){
+  const f=$('#authForm');if(!f)return;
+  f.addEventListener('submit',e=>{
+    e.preventDefault();
+    const u=$('#au-u').value,p=$('#au-p').value;
+    const sess=tryLogin(u,p);
+    if(!sess){S.authErr='Sai tên đăng nhập hoặc mật khẩu.';S.authForm={u,p:''};render();return}
+    S.auth=sess;S.authErr='';S.authForm={u:'',p:''};S.tab=homeTab();render();
+  });
+}
 function render(){
+  applyTheme();
+  if(!S.auth){renderAuth();return}
+  $('#authScreen').hidden=true;$('#appRoot').hidden=false;$('#tabbar').hidden=false;
   const ae=document.activeElement,aid=ae&&ae.id,sel=ae&&('selectionStart' in ae)?(()=>{try{return [ae.selectionStart,ae.selectionEnd]}catch(e){return null}})():null;
   const inView=ae&&$('#view').contains(ae);
-  applyTheme();
-  if(!VIEWS[S.tab])S.tab='dash';
+  if(!VIEWS[S.tab]||!canAccess(S.tab))S.tab=homeTab();
   renderShell();
   let html='';
   if(S.dbOk===false&&!S.bannerHidden)html+=`<div class="banner" style="display:flex;gap:10px;align-items:center">Bản chạy độc lập: dữ liệu được lưu trên trình duyệt của máy này. Nhớ sao lưu trong Cài đặt.<button class="btn sm ghost" type="button" data-act="banner-x" style="margin-left:auto" aria-label="Ẩn">${I('x')}</button></div>`;
@@ -8503,14 +8637,16 @@ document.addEventListener('click',async e=>{
   try{
   if(a.startsWith('t-'))return tableAct(a,ds);
   switch(a){
-    case 'tab':go(ds.tab);break;
+    case 'tab':if(!canAccess(ds.tab)){toast('Bạn không có quyền vào mục này.');break}go(ds.tab);break;
     case 'nav-open':S.navOpen=true;renderShell();break;
     case 'nav-close':S.navOpen=false;renderShell();break;
     case 'bell':S.bell=!S.bell;renderShell();break;
     case 'banner-x':S.bannerHidden=true;render();break;
     case 'g-go':gGo(ds.t,ds.id);break;
     case 'mode':if(ds.mode===mode)break;mode=ds.mode;try{localStorage.setItem('vua-mode',mode)}catch(x){}closeSheet();S.apptStaff='all';S.calStaff='all';S.sel={};S.tq={};S.cart=newCart();subscribe();render();toast('Đã chuyển sang chế độ '+T().org);break;
-    case 'settings':go('settings');break;
+    case 'settings':if(!canAccess('settings')){toast('Bạn không có quyền vào Cài đặt.');break}go('settings');break;
+    case 'auth-fill':S.authForm={u:ds.u,p:ds.p};S.authErr='';render();break;
+    case 'logout':clearSession();S.auth=null;S.authForm={u:'',p:''};closeSheet();render();break;
     case 'close':closeSheet();break;
     case 'zalo':{const m=ds.msg;if(m&&navigator.clipboard){navigator.clipboard.writeText(m).then(()=>toast('Đã chép tin nhắn mẫu, dán vào Zalo để gửi'),()=>toast('Mở Zalo… (không chép được tin nhắn)'))}break}
     case 'contact':await put('contacts',`${ds.cid}_${TODAY}_${ds.kind}`,{customerId:ds.cid,kind:ds.kind,date:TODAY});toast('Đã đánh dấu đã liên hệ');break;

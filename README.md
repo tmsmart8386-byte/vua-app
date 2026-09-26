@@ -73,9 +73,27 @@ Mỗi ngành là một không gian dữ liệu riêng `ws/{spa|nhakhoa}/...`, n�
 | shiftreq | Đăng ký ca theo tuần (`{staffId}_{thứ 2 đầu tuần}`): ngày xin nghỉ, ca không làm được theo ngày, nguyện vọng ca, số giờ mục tiêu, ghi chú |
 | advances | Tạm ứng lương |
 
+## Đăng nhập & phân quyền theo bộ phận
+
+Mở app sẽ gặp màn hình đăng nhập. Mỗi vai trò chỉ thấy đúng menu của bộ phận mình, giúp vận hành và kiểm tra độc lập từng luồng.
+
+| Vai trò | Tài khoản / mật khẩu | Được vào |
+| --- | --- | --- |
+| Chủ / Quản lý | `admin` / `admin123` | Toàn bộ hệ thống, kể cả Cài đặt và Tài khoản & phân quyền |
+| Lễ tân | `letan` / `letan123` | Việc hôm nay, Khách hàng, Lịch hẹn, Lịch đặt chỗ, Danh sách chờ, Ghi chú |
+| Thu ngân | `thungan` / `thungan123` | Thu ngân (POS), Hóa đơn, Khách hàng |
+| Quản lý kho | `kho` / `kho123` | Dịch vụ & gói, Sản phẩm & kho, Nhà cung cấp & nhập |
+| Nhân sự & lương | `nhansu` / `nhansu123` | Nhân viên, Xếp ca, Chấm công, Bảng lương |
+| Kế toán | `ketoan` / `ketoan123` | Bảng điều khiển, Hóa đơn, Chi phí, Báo cáo, Khuyến mãi |
+| Kỹ thuật viên / Bác sĩ | `nv` / `nv123` | Việc hôm nay, Lịch đặt chỗ, Chấm công (tự chấm công vào/ra ca) |
+
+Trên màn hình đăng nhập có sẵn khung "Tài khoản dùng thử" — bấm vào là điền nhanh để đổi vai trò, tiện cho việc kiểm tra từng bộ phận. Chủ/Quản lý vào **Tài khoản & phân quyền** (menu Hệ thống) để thêm/sửa/xóa tài khoản thật cho nhân viên, đổi mật khẩu, gán đúng vai trò.
+
+**Giới hạn:** đây là khóa mềm ở phía trình duyệt (client-side), tài khoản và mật khẩu lưu trong `localStorage` của từng máy — phù hợp để phân luồng thao tác nội bộ và demo cho từng bộ phận, **không phải cơ chế bảo mật chống truy cập trái phép thực sự** (ai mở DevTools trên máy đó vẫn xem được danh sách tài khoản). Muốn bảo mật thật, cần bản có backend (mục dưới).
+
 ## Chưa có
 
-- Đăng nhập, phân quyền nhân viên, nhiều cơ sở dùng chung trên máy chủ
+- Xác thực phía máy chủ (hash mật khẩu, chống truy cập trái phép thực sự), nhiều cơ sở dùng chung trên máy chủ
 - Gửi Zalo ZNS tự động (hiện là nút mở Zalo kèm tin nhắn chép sẵn)
 - Thanh toán online, hóa đơn điện tử theo quy định thuế
 
