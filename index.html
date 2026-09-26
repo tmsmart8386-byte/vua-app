@@ -8020,6 +8020,32 @@ function waitForm(id,pre){
      {k:'staffId',l:T().staff+' mong muốn',type:'select',opts:[['','Ai cũng được'],...activeStaff().map(s=>[s.id,s.name])],row:'b'},{k:'date',l:'Ngày mong muốn',type:'date',row:'b'},{k:'slot',l:'Khung giờ',ph:'VD: sau 17h, sáng thứ 7',row:'c'},{k:'status',l:'Trạng thái',type:'select',opts:Object.entries(WSTAT).map(([k,v])=>[k,v[0]]),row:'c'},{k:'note',l:'Ghi chú',type:'textarea',rows:2}],
     onSave:async v=>{const phone=String(v.phone||'').replace(/\D/g,'');const cu=phone&&all('customers').find(c=>c.phone===phone);await put('waitlist',id||uid(),{...w,...v,phone,customerId:cu?cu.id:(w.customerId||''),createdAt:w.createdAt||TODAY});toast(id?'Đã lưu':'Đã thêm vào danh sách chờ')}});
 }
+async function syncLeads(){
+  toast('Đang đồng bộ lead…');
+  try{
+    const r=await fetch('/api/leads?mode='+mode);
+    const j=await r.json();
+    if(!j.ok)throw new Error(j.error||'Lỗi không xác định');
+    const leads=j.leads||[];
+    if(!leads.length){toast('Không có lead mới.');return}
+    const ids=[];
+    for(const lead of leads){
+      const noteParts=[];
+      if(lead.service)noteParts.push('Quan tâm: '+lead.service);
+      if(lead.note)noteParts.push(lead.note);
+      noteParts.push('Nguồn: '+(SOURCE_LABEL[lead.source]||lead.source||'Website'));
+      await put('waitlist',uid(),{name:lead.name,phone:lead.phone,status:'waiting',note:noteParts.join(' · '),createdAt:TODAY,leadId:lead.id});
+      ids.push(lead.id);
+    }
+    await fetch('/api/leads',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids})});
+    toast('Đã thêm '+leads.length+' lead mới vào Danh sách chờ');
+    render();
+  }catch(e){
+    console.error(e);
+    toast('Không đồng bộ được lead (kiểm tra mạng, hoặc trang đăng ký chưa deploy).');
+  }
+}
+const SOURCE_LABEL={website:'Website',facebook:'Facebook',fb:'Facebook',zalo:'Zalo',tiktok:'TikTok',google:'Google'};
 async function waitBook(id){
   const w=get('waitlist',id);if(!w)return;let cid=w.customerId;
   if(!cid){const phone=String(w.phone||'').replace(/\D/g,'');const ex=phone&&all('customers').find(c=>c.phone===phone);if(ex)cid=ex.id;else{cid=uid();await put('customers',cid,{name:w.name,phone,source:'Vãng lai',createdAt:TODAY,xung:T().xung})}}
@@ -8029,12 +8055,14 @@ function viewWait(){
   const F=S.waitF;let rows=all('waitlist');if(F!=='all')rows=rows.filter(w=>w.status===F);
   rows.sort((a,b)=>(a.status==='waiting'?0:1)-(b.status==='waiting'?0:1)||(a.date||'').localeCompare(b.date||''));
   const filters=chipsRow('wait-f',F,[['waiting','Đang chờ'],['booked','Đã xếp lịch'],['cancelled','Đã hủy'],['all','Tất cả']]);
+  const leadUrl=location.origin+'/dang-ky.html'+(mode==='nhakhoa'?'?nganh=nhakhoa':'');
   return pageHead('wait','Danh sách chờ',`Ghi lại ${T().cust} muốn đặt khi đã kín lịch, xếp lịch ngay khi có chỗ trống`)+
+   `<div class="warnbox" style="margin-bottom:14px">📎 Trang đăng ký lead tự động: <a href="${esc(leadUrl)}" target="_blank" rel="noopener"><b>${esc(leadUrl)}</b></a> — dán link này vào bio Facebook/TikTok/Zalo hoặc nút CTA quảng cáo. Khách điền form xong, bấm <b>Đồng bộ lead mới</b> bên dưới để kéo về đây.</div>`+
    dataTable({key:'wait',title:'Danh sách chờ',exportName:'danh-sach-cho',rows,filters,
     cols:[{l:'Họ tên',v:w=>`<b>${esc(w.name)}</b>`,x:w=>w.name},{l:'Điện thoại',v:w=>esc(phoneFmt(w.phone)),x:w=>w.phone||''},{l:'Dịch vụ',v:w=>esc(w.serviceId?serviceName(w.serviceId):'—'),x:w=>w.serviceId?serviceName(w.serviceId):''},{l:T().staff,v:w=>esc(w.staffId?staffOf(w.staffId).name:'Ai cũng được'),x:w=>w.staffId?staffOf(w.staffId).name:''},
      {l:'Ngày muốn',v:w=>w.date?`${WD[parseYmd(w.date).getDay()]} ${dm(w.date)}`:'—',x:w=>w.date||''},{l:'Khung giờ',v:w=>esc(w.slot||'—'),x:w=>w.slot||''},{l:'Ghi chú',cls:'wrap',v:w=>esc(w.note||''),x:w=>w.note||''},{l:'Trạng thái',v:w=>`<span class="pill ${(WSTAT[w.status]||WSTAT.waiting)[1]}">${(WSTAT[w.status]||WSTAT.waiting)[0]}</span>`,x:w=>(WSTAT[w.status]||WSTAT.waiting)[0]}],
     add:()=>waitForm(),edit:id=>waitForm(id),del:async id=>del('waitlist',id),
-    extra:[{id:'book',l:'Xếp lịch ngay',icon:'appts',cls:'pdf',needSel:1,run:id=>waitBook(id)}]});
+    extra:[{id:'sync-leads',l:'Đồng bộ lead mới',icon:'db',cls:'view',run:()=>syncLeads()},{id:'book',l:'Xếp lịch ngay',icon:'appts',cls:'pdf',needSel:1,run:id=>waitBook(id)}]});
 }
 
 /* ---------- CLIENT NOTES ---------- */

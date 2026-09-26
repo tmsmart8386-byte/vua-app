@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Đăng ký tư vấn miễn phí</title>
+<meta name="robots" content="noindex">
+<style>
+:root{--bg:#FBF6F8;--surface:#FFFFFF;--ink:#241B22;--muted:#6E6370;--line:#EEDFE6;--accent:#E0156B;--accent-2:#C2105C;--accent-soft:#FCE7F0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.card{width:100%;max-width:440px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:28px 24px;box-shadow:0 20px 50px rgba(0,0,0,.10)}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.logo{width:44px;height:44px;border-radius:50%;background:var(--accent);display:grid;place-items:center;color:#fff;font-weight:700;flex:none}
+h1{font-size:19px;margin:0}
+.sub{color:var(--muted);font-size:13px;margin:2px 0 0}
+p.lead{font-size:14px;color:var(--muted);margin:16px 0 18px;line-height:1.5}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:13px}
+label{font-size:13px;font-weight:600}
+input,select,textarea{border:1px solid var(--line);border-radius:10px;padding:11px 12px;font-size:15px;font-family:inherit;background:#fff;color:var(--ink)}
+textarea{resize:vertical;min-height:60px}
+.seg{display:flex;gap:8px;margin-bottom:16px}
+.seg button{flex:1;border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px;font-weight:600;font-size:13.5px;cursor:pointer;color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn{width:100%;border:none;background:var(--accent);color:#fff;border-radius:12px;padding:14px;font-size:16px;font-weight:700;cursor:pointer}
+.btn:disabled{opacity:.6;cursor:default}
+.err{background:var(--accent-soft);color:var(--accent-2);border-radius:10px;padding:9px 12px;font-size:13px;margin-bottom:12px;display:none}
+.done{display:none;text-align:center}
+.done .tick{width:56px;height:56px;border-radius:50%;background:#DDF1EA;color:#155E50;display:grid;place-items:center;margin:0 auto 14px;font-size:28px}
+.done h2{margin:0 0 8px;font-size:19px}
+.done p{color:var(--muted);font-size:14px;line-height:1.5;margin:0 0 18px}
+.zalo{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;border-radius:12px;padding:13px;background:#e8f3ff;color:#1553A6;font-weight:700;text-decoration:none;font-size:15px}
+.foot{margin-top:16px;text-align:center;font-size:11.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="card">
+  <div id="form-wrap">
+    <div class="brand"><div class="logo" id="logo">S</div><div><h1 id="bizname">Spa của bạn</h1><p class="sub">Đăng ký tư vấn miễn phí</p></div></div>
+    <p class="lead">Để lại thông tin, chúng tôi sẽ liên hệ tư vấn và đặt lịch cho bạn trong thời gian sớm nhất.</p>
+    <div class="err" id="err"></div>
+    <form id="leadForm">
+      <div class="seg" id="modeSeg" role="group" aria-label="Chọn dịch vụ">
+        <button type="button" data-m="spa" aria-pressed="true">Spa &amp; thẩm mỹ</button>
+        <button type="button" data-m="nhakhoa" aria-pressed="false">Nha khoa</button>
+      </div>
+      <div class="field"><label for="f-name">Họ tên *</label><input id="f-name" name="name" required autocomplete="name" placeholder="Nguyễn Thị A"></div>
+      <div class="field"><label for="f-phone">Số điện thoại *</label><input id="f-phone" name="phone" type="tel" inputmode="tel" required autocomplete="tel" placeholder="09xx xxx xxx"></div>
+      <div class="field"><label for="f-service">Dịch vụ quan tâm</label><input id="f-service" name="service" placeholder="VD: Chăm sóc da, Niềng răng…"></div>
+      <div class="field"><label for="f-note">Ghi chú</label><textarea id="f-note" name="note" placeholder="Khung giờ mong muốn, câu hỏi thêm…"></textarea></div>
+      <button class="btn" type="submit" id="submitBtn">Gửi đăng ký</button>
+    </form>
+    <div class="foot">Thông tin của bạn chỉ dùng để liên hệ tư vấn, không chia sẻ cho bên thứ ba.</div>
+  </div>
+  <div class="done" id="done">
+    <div class="tick">✓</div>
+    <h2>Đã gửi đăng ký thành công!</h2>
+    <p>Cảm ơn bạn đã quan tâm. Chúng tôi sẽ gọi lại trong thời gian sớm nhất. Nếu cần gấp, bạn có thể nhắn Zalo ngay:</p>
+    <a class="zalo" id="zaloBtn" href="#" target="_blank" rel="noopener">💬 Nhắn Zalo ngay</a>
+  </div>
+</div>
+<script>
+(function(){
+  "use strict";
+  function loadSettings(mode){
+    try{
+      var raw=JSON.parse(localStorage.getItem('vua-local-'+mode)||'{}');
+      var m=raw.settings||{};
+      var rec=m.main;
+      return rec||null;
+    }catch(e){return null}
+  }
+  var mode='spa';
+  var qs=new URLSearchParams(location.search);
+  if(qs.get('nganh')==='nhakhoa')mode='nhakhoa';
+  var source=qs.get('src')||qs.get('source')||'website';
+
+  function applyBrand(){
+    var st=loadSettings(mode);
+    var name=(st&&st.name)||(mode==='nhakhoa'?'Nha khoa của bạn':'Spa của bạn');
+    document.getElementById('bizname').textContent=name;
+    document.getElementById('logo').textContent=(name||'S').trim().charAt(0).toUpperCase();
+    document.title='Đăng ký tư vấn – '+name;
+    document.getElementById('leadForm').dataset.phone=(st&&st.phone)||'';
+  }
+  applyBrand();
+
+  var seg=document.getElementById('modeSeg');
+  seg.addEventListener('click',function(e){
+    var b=e.target.closest('button');if(!b)return;
+    mode=b.dataset.m;
+    Array.from(seg.querySelectorAll('button')).forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});
+    applyBrand();
+  });
+
+  var form=document.getElementById('leadForm'),err=document.getElementById('err'),btn=document.getElementById('submitBtn');
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    err.style.display='none';
+    var name=document.getElementById('f-name').value.trim();
+    var phone=document.getElementById('f-phone').value.replace(/\D/g,'');
+    if(!name||phone.length<9){err.textContent='Nhập đầy đủ họ tên và số điện thoại hợp lệ.';err.style.display='block';return}
+    btn.disabled=true;btn.textContent='Đang gửi…';
+    var payload={
+      name:name,phone:phone,
+      service:document.getElementById('f-service').value.trim(),
+      note:document.getElementById('f-note').value.trim(),
+      source:source,mode:mode
+    };
+    fetch('/api/leads',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+      .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j}})})
+      .then(function(res){
+        if(!res.ok||!res.j.ok){throw new Error((res.j&&res.j.error)||'Có lỗi, thử lại sau.')}
+        document.getElementById('form-wrap').style.display='none';
+        var done=document.getElementById('done');done.style.display='block';
+        var st=loadSettings(mode),bizPhone=(st&&st.phone)||'';
+        var msg='Chào '+((st&&st.name)||'shop')+', em là '+name+' ('+phone+'). Em muốn tư vấn về: '+(payload.service||'dịch vụ')+'.';
+        var zaloUrl=bizPhone?('https://zalo.me/'+bizPhone.replace(/\D/g,'')):'https://zalo.me';
+        var z=document.getElementById('zaloBtn');z.href=zaloUrl;
+        try{navigator.clipboard&&navigator.clipboard.writeText(msg)}catch(e){}
+      })
+      .catch(function(e){
+        err.textContent=e.message||'Có lỗi, thử lại sau.';err.style.display='block';
+        btn.disabled=false;btn.textContent='Gửi đăng ký';
+      });
+  });
+})();
+</script>
+</body>
+</html>
